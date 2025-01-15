@@ -1,0 +1,105 @@
+{%extends "base.html" %}
+
+{%block incluir_navbar%}
+    {% include "navbar.html" %}
+{%endblock%}
+
+{%block busqueda %}
+<div class="d-flex gap-2 justify-content-center py-1">
+    <h4 class="mb-3">Búsqueda por Usuario</h4>
+</div> 
+
+{% comment %} <div class="d-flex gap-1 justify-content-center">
+    <div class="my-3">
+        <form class="d-flex" method="GET" action="">{% csrf_token %} 
+            <div class="form-check">
+                <input id="nom_ap" name="nom_ap" type="radio" value="{{request.GET.tipo_busqueda}}" class="form-check-input" checked required>
+                <label class="form-check-label" for="nom_ap">Usuario</label>
+            </div>
+            <div class="form-check">
+                <input id="cumple" name="cumple" type="radio" value="{{request.GET.tipo_busqueda}}" class="form-check-input" required>
+                <label class="form-check-label" for="cumple">Nombre/Apellido</label>
+            </div>
+        </form>    
+    </div>
+</div> {% endcomment %}
+
+<div class="px-1 py-1 my-1 text-center">
+    {%include "buscador.html"%} 
+</div>
+
+{%endblock%}
+
+{%block grilla%}
+{% load static %}
+<div class="text-start">
+    <div class="container col- col-md-7 border p-3">
+        <form method= "POST" action ="" >{%csrf_token%}
+            {% if messages %}
+                {% for message in messages %}
+                    <span id="errorMessage"> {{message}}</span><br><br>
+                {% endfor %}
+            {% endif %}
+            <table class="table">
+                <thead class="table-primary">
+                    <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for obj in usuario%}
+                    <tr>
+                    <td>
+                        <input type="radio" value="{{obj}}" name="user_seleccionado">
+                    </td> 
+                    <td>
+                        {{obj.username}} 
+                    </td>
+                    <td>
+                        {{obj.first_name}} 
+                    </td>
+                    <td>
+                        {{obj.last_name}} 
+                    </td>
+                    </tr>                
+                    {% empty %}
+                    <p>No hay registros</p>
+                    {%endfor%} 
+                </tbody>
+            </table>                                          
+            <input type="submit" class="btn btn-primary" value="Modificar">
+        </form>      
+    </div>
+</div>
+
+{%endblock%}
+
+{%block botones%}
+{% comment %} <div class="d-flex gap-2 justify-content-center py-5">
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
+      Nuevo
+      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
+    </button>
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
+      Grabar
+      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
+    </button>
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
+      Editar
+      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
+    </button>
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
+      Inactivar
+      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
+    </button>
+</div> {% endcomment %}
+
+<div class="d-flex gap-2 justify-content-center py-1">
+    <a href="{%url 'Usuario_mante'%}" class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
+        Nuevo Registro
+    </a>
+</div>    
+{%endblock%}

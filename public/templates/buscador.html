@@ -1,0 +1,12 @@
+<div class="container col- col-md-3 p-3">
+    <form class="d-flex" method="GET" role="search" action="">{% csrf_token %}                     
+        <input class="form-control" type="text" placeholder="" aria-label="Search" name="buscar" value="{{request.GET.buscar}}">
+        <button class="btn btn-primary" type="submit">Buscar</button>
+    </form>               
+</div>
+
+    
+
+
+
+
