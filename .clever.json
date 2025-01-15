@@ -1,0 +1,10 @@
+{
+    "deploy": {
+      "build": [
+        "python manage.py collectstatic --noinput"
+      ]
+    },
+    "static": {
+      "/static": "staticfiles/"
+    }
+  }
