@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,11 +84,11 @@ WSGI_APPLICATION = 'ViewTech.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "soporte_tecnico",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "NAME": config("POSTGRESQL_ADDON_DB"),
+        "USER": config("POSTGRESQL_ADDON_USER"),
+        "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
+        "HOST": config("POSTGRESQL_ADDON_HOST"),
+        "PORT": config("POSTGRESQL_ADDON_PORT"),
     }
 }
 
