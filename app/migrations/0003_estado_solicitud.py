@@ -17,10 +17,11 @@ class Migration(migrations.Migration):
                 ('id_estado', models.AutoField(primary_key=True, serialize=False)),
                 ('nombre', models.CharField(max_length=50)),
                 ('descripcion', models.CharField(max_length=150)),
+                ('activo', models.BooleanField()),
             ],
             options={
                 'db_table': 'estado',
-                'managed': False,
+                'managed': True,
             },
         ),
         migrations.CreateModel(

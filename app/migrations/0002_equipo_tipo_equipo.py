@@ -14,11 +14,16 @@ class Migration(migrations.Migration):
             name='Equipo',
             fields=[
                 ('id_equipo', models.AutoField(primary_key=True, serialize=False)),
-                ('caracteristicas', models.CharField(max_length=100)),
+                ('marca', models.CharField(max_length=50)),
+                ('modelo', models.CharField(max_length=50)),
+                ('serie', models.CharField(max_length=50)),
+                ('descripcion', models.CharField(max_length=100)),
+                ('id_cliente', models.IntegerField()),
+                ('id_tipo_equipo', models.IntegerField()),
             ],
             options={
                 'db_table': 'equipo',
-                'managed': False,
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -30,7 +35,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'tipo_equipo',
-                'managed': False,
+                'managed': True,
             },
         ),
     ]

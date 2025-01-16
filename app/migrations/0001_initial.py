@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'cliente',
-                'managed': False,
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -162,7 +162,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'prestadora',
-                'managed': False,
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'telefono',
-                'managed': False,
+                'managed': True,
             },
         ),
     ]
