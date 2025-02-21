@@ -18,11 +18,11 @@
     <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
 
     <div class="form-floating">
-      <input type="usuario" class="form-control" id="floatingInput" placeholder="Usuario" name="username">
+      <input type="usuario" class="form-control" id="username" placeholder="Usuario" name="username">
       <label for="floatingInput">Usuario</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="PasswordC" name="password">
+      <input type="password" class="form-control" id="password" placeholder="PasswordC" name="password">
       <label for="floatingPassword">Contraseña</label>
     </div>
 
@@ -33,19 +33,31 @@
       </label>
     </div>
 
-    <a href="{%url 'Principal'%}" class="btn btn-lg btn-outline-primary mb-3">Iniciar sesión</a>
+    {% comment %} <a href="{%url 'Principal'%}" class="btn btn-lg btn-outline-primary mb-3">Iniciar sesión</a> {% endcomment %}
+
+    <button type="submit" class="btn btn-lg btn-outline-primary mb-3" >Iniciar Sesión</button>
+
+
+    {% comment %} {% if messages %}
+    {% for message in messages %}
+        <span >{{message}}</span><br>
+    {% endfor %}
+    {% endif %} {% endcomment %}
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
   </form>
-  {% if messages %}
-  {% for message in messages %}
-      <span >{{message}}</span><br>
-  {% endfor %}
-  {% endif %}
 </main>
 </main>
-<script src="{% static 'js/bootstrap.bundle.min.js' %}" integrity_="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity_="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 {%endblock%}
 
 </html>

@@ -18,18 +18,25 @@ def Login(request):
         usuario=request.POST['username']
         password=request.POST['password']
         user=authenticate(username=usuario,password=password)
+        print(usuario)
+        print(password)
         if user is not None:
             print(user.get_username())
             login(request, user)
             usuario=User.objects.get(username=user.get_username())
-            if usuario.is_staff==True:
+            #if usuario.is_staff==True:
                 #para redigir al admin si es administrador
-                return redirect('admin:login')
-            elif usuario.is_active:
+              #  return redirect('admin:login')
+            #elif usuario.is_active:
+            if usuario.is_active:
                 return redirect('Principal')
+            else:
+               messages.error (request, "Usuario Inactivo")
+               return redirect('Acceso')
+
         else:
             messages.error (request, "Usuario o contraseña incorrecta")
-            return redirect('login')
+            return redirect('Acceso')
         
    return render(request,"login.html",{})
 
@@ -576,5 +583,7 @@ def usuario_mante_pass(request):
       'form'  : form
    } 
    return render(request, 'usuarioPass.html', context) """
+
+
 
 
