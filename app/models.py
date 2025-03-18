@@ -238,7 +238,7 @@ class Solicitud(models.Model):
     
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'solicitud'
 
 class Tipo_respuesto_acc(models.Model):
