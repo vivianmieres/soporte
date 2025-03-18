@@ -434,7 +434,7 @@ def estado_consulta(request):
       'titulo'      : "Consulta de Estado",
       'estado'     : estado,
    } 
-   return render(request,"EstadoConsulta.html",context)
+   return render(request,"estadoConsulta.html",context)
 
 #Mantenimiento
 def estado_mante(request): 
