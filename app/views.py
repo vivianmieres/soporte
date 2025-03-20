@@ -208,19 +208,20 @@ def equipo(request):
 #Consulta
 def equipo_consulta(request):
    equipo = []
-   equipo = models.Equipo.objects.select_related('id_tipo_equipo').all()
+   equipo = models.Equipo.objects.select_related('id_tipo_equipo','id_cliente').all()
    print(equipo)
    if request.method=="GET":
       busqueda = request.GET.get("buscar")
       print(busqueda)
       if busqueda:      
-         equipo = (models.Equipo.objects.filter(caracteristicas__icontains = busqueda))
+         equipo = (models.Equipo.objects.filter(marca__icontains = busqueda) or
+                   models.Equipo.objects.filter(modelo__icontains = busqueda))
       print(equipo)
    elif request.method=="POST":
       equipo_seleccionado= request.POST.get("equipo_seleccionado",False)
       print(equipo_seleccionado)
       if equipo_seleccionado != False:
-         pk_equipo = models.Equipo.objects.get(caracteristicas = equipo_seleccionado)
+         pk_equipo = models.Equipo.objects.get(id_equipo = equipo_seleccionado)
          print(pk_equipo.id_equipo)
          return redirect('Equipo_mante_pk',pk=pk_equipo.id_equipo)
       else: 
@@ -236,7 +237,8 @@ def equipo_consulta(request):
 def equipo_mante(request): 
    form = CargaEquipoForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid:    
+      if form.is_valid: 
+            
          aux1 = form.data.get("caracteristicas")
          print(aux1)
          # form_data = form.cleaned_data
@@ -254,7 +256,7 @@ def equipo_mante(request):
 
 #Modificacion
 def equipo_mante_pk(request,pk): 
-   equipo = models.Equipo.objects.get(id_tipo_equipo = pk)
+   equipo = models.Equipo.objects.get(id_equipo = pk)
    form = CargaEquipoForm(request.POST or None, instance = equipo) 
    if request.method=="POST": 
       if form.is_valid:    
@@ -434,7 +436,7 @@ def estado_consulta(request):
       'titulo'      : "Consulta de Estado",
       'estado'     : estado,
    } 
-   return render(request,"EstadoConsulta.html",context)
+   return render(request,"estadoConsulta.html",context)
 
 #Mantenimiento
 def estado_mante(request): 
