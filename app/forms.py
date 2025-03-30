@@ -6,17 +6,64 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 
-class CargaUsuarioForm(UserCreationForm):
+class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["first_name"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["last_name"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["email"].widget.attrs.update({
+            'class':'form-control'
+        })
+
     class Meta:
         model= User
-        fields= ["username","first_name","last_name", "email","is_staff","is_active","is_superuser"]
+        fields= ["username","first_name","last_name", "email","is_staff","is_active","is_superuser","password1","password2"]
 
-
+    widgets ={
+            'is_superuser': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+            'is_staff': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+            'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        } 
+    
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        
+        if len(username) < 5:
+            raise forms.ValidationError("El nombre de usuario debe tener al menos 5 caracteres.")
+        return username   
 
 class ModifUsuarioForm(UserChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["first_name"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["last_name"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["email"].widget.attrs.update({
+            'class':'form-control'
+        })
+
     class Meta:
         model= User
         fields= ["username","first_name","last_name", "email","is_staff","is_active","is_superuser"]
+
+    widgets ={
+            'is_superuser': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+            'is_staff': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+            'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+    }    
 
     password = ReadOnlyPasswordHashField(
         label= ("Contraseña"),

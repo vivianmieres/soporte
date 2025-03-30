@@ -79,15 +79,14 @@ def usuario_consulta(request):
 def usuario_mante(request):
    form = CargaUsuarioForm(request.POST or None) 
    if request.method=="POST":
-        if form.is_valid:    
-            aux1 = form.data.get("username")
-            print(aux1)
-            print(form.data)
+        if form.is_valid():    
+            username1 = form.data.get("username")
+            print(username1)
+            #username2 = form.cleaned_data.get("username")
             form.save()
             return redirect('Usuario_consulta')
         else:
-            form= CargaUsuarioForm()
-            messages.error("No se guardaron los datos")        
+            print(form.errors)     
             
    context = {
       'titulo': "Mantenimiento de Usuario",
@@ -100,20 +99,18 @@ def usuario_mante_pk(request,pk):
    usuario= models.AuthUser.objects.get(id = pk)
    form = ModifUsuarioForm(request.POST or None, instance = usuario) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if form.is_valid():    
          form.save()
-         return redirect('usuario_consulta')
-      else:
-         form= ModifUsuarioForm(instance = usuario)     
-         messages.error("No se guardaron los datos")   
-   # elif request.method == "GET":
-   #    redirect('Usuario_mante_pass')
-
+         return redirect('Usuario_consulta')
+      else:   
+         print(form.errors) 
+        
    context = {
       'titulo': "Mantenimiento de Usuario",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
+
 
 #Modificacion password
 class usuario_mante_pass(PasswordChangeView):
