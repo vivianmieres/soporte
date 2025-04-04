@@ -29,6 +29,11 @@ urlpatterns = [
     path('usuario_mante/', views.usuario_mante, name= 'Usuario_mante'),
     path('usuario_mante_pk/<str:pk>', views.usuario_mante_pk, name= 'Usuario_mante_pk'),
     path('usuario_consulta/', views.usuario_consulta, name= 'Usuario_consulta'),
+    #modulo usuario - cambio contrasenha
+    path('password/', views.usuario_pass, name= 'Usuario_pass'),
+    path('password_consulta/', views.usuario_consulta_pass, name= 'Usuario_consulta_pass'),
+    path('password_mante/<str:pk>', views.usuario_mante_pass, name= 'Usuario_mante_pass'),
+    path('password_mante_login/', views.usuario_mante_pass_login, name= 'Usuario_mante_pass_login'),
     #modulo cliente
     path('cliente_mante/', views.cliente_mante, name= 'Cliente_mante'),
     path('cliente_mante_pk/<str:pk>', views.cliente_mante_pk, name= 'Cliente_mante_pk'),

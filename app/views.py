@@ -8,9 +8,8 @@ from django.db.models import Q
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
-from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
 # Create your views here.
 
 def Login(request):
@@ -113,11 +112,84 @@ def usuario_mante_pk(request,pk):
 
 
 #Modificacion password
-class usuario_mante_pass(PasswordChangeView):
-    form_class = ModifPasswordForm
-    success_url = '/'
-    #success_url = reverse_lazy('Usuario_mante_pass')
-    template_name = 'usuarioPass.html'
+def usuario_pass(request):
+   usuario_acual = request.user
+   # if usuario_acual.is_superuser:
+   #    return redirect('Usuario_consulta_pass')
+     
+   # else: 
+   return redirect('Usuario_mante_pass_login')
+   
+
+def usuario_consulta_pass(request):
+   usuarios = []
+   usuarios = models.AuthUser.objects.all()
+   if request.method=="GET":
+        solicitud_busqueda = request.GET.get("buscar")
+        print(solicitud_busqueda)
+        if solicitud_busqueda:
+            #busca por nombre, apellido
+            usuarios = (models.AuthUser.objects.filter(username__icontains = solicitud_busqueda))
+   elif request.method=="POST":
+      user_seleccionado= request.POST.get("user_seleccionado",False)
+      print(user_seleccionado)
+      if user_seleccionado != False:
+         pk_user = models.AuthUser.objects.get(username=user_seleccionado)
+         print(pk_user.username)
+         return redirect('Usuario_mante_pass')
+      else: 
+         messages.error(request,"No se selecciono a un cliente")
+   context = {
+      'titulo'      : "Modificar contraseña de Usuario",
+      'usuario'     : usuarios
+
+   } 
+   return render(request,"usuarioConsulta.html",context)   
+
+
+def usuario_mante_pass(request, pk):
+   usuario= models.AuthUser.objects.get(id = pk)
+   if request.method == 'POST':
+      form = PasswordChangeForm(usuario, request.POST)
+      if form.is_valid():
+         user = form.save()
+         update_session_auth_hash(request, user)  # Mantiene la sesión activa
+         messages.success(request, 'Tu contraseña ha sido cambiada con éxito.')
+         return redirect('Usuario_consulta_pass')  # Redirige a la página de perfil u otra
+      else:
+         print(form.errors) 
+   else:
+      form = PasswordChangeForm(usuario, request.POST)
+
+   context = {
+      'titulo': "Modificar contraseña de Usuario",
+      'form'  : form
+   }
+
+   return render(request,"baseMante.html",context)
+
+@login_required
+def usuario_mante_pass_login(request):
+   if request.method == 'POST':
+      print(request.user.username)
+      form = PasswordChangeForm(request.user, request.POST)
+      if form.is_valid():
+         user = form.save()
+         update_session_auth_hash(request, user)  # Mantiene la sesión activa
+         messages.success(request, 'Tu contraseña ha sido cambiada con éxito.')
+         return redirect('Principal')
+      else:
+         print(form.errors) 
+   else:
+      form = PasswordChangeForm(request.user)
+
+   context = {
+      'titulo': "Modificar contraseña de Usuario",
+      'form'  : form
+   }
+
+   return render(request,"baseMante.html",context)
+
 
 #MODULO CLIENTE
 #Consulta

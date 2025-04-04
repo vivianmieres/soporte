@@ -6,12 +6,17 @@
 
 
 {%block imagen%}
-{% load static %}
-<img class="d-block mx-auto mb-4" src= "{% static 'images/logo2.jpg' %}" alt="" width="900" height="400">
+    {% load static %}
+    <img class="d-block mx-auto mb-4" src= "{% static 'images/logo2.jpg' %}" alt="" width="900" height="400">
+
+    {% if messages %}
+    <div style="display: flex; justify-content: center; align-items: center;">
+        {% for message in messages %}
+                {{ message }}
+            </span><br><br>
+        {% endfor %}
+    </div>
+{% endif %}
 {%endblock%}
 
-{% comment %} {%block cerrar_sesion%}
-<div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
-    <a href="{% url 'Acceso' %}" class="btn btn-lg btn-outline-primary mb-3">Cerrar sesión</a>
-</div>
-{%endblock%} {% endcomment %}
+
