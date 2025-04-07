@@ -38,7 +38,7 @@ urlpatterns = [
     path('cliente_mante/', views.cliente_mante, name= 'Cliente_mante'),
     path('cliente_mante_pk/<str:pk>', views.cliente_mante_pk, name= 'Cliente_mante_pk'),
     path('cliente_consulta/', views.cliente_consulta, name= 'Cliente_consulta'),
-    path('password/', usuario_mante_pass.as_view(), name= 'Usuario_mante_pass'),
+    #path('password/', usuario_mante_pass.as_view(), name= 'Usuario_mante_pass'),
    # path('usuario_mante_pk/<str:pk>/password/', views.usuario_mante_pass, name= 'Usuario_mante_pass')
    #modulo equipo
    path('equipo/',views.equipo, name='Equipo'),
