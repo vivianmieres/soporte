@@ -86,28 +86,9 @@
 {%endblock%}
 
 {%block botones%}
-{% comment %} <div class="d-flex gap-2 justify-content-center py-5">
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Nuevo
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Grabar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Editar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Inactivar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-</div> {% endcomment %}
 
 <div class="d-flex gap-2 justify-content-center py-1">
-    <a href="{%url 'Solicitud_mante'%}" class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-        Nuevo Registro
-    </a>
-</div>    
+    <a href="{%url 'Solicitud_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
+</div>  
+
 {%endblock%}
