@@ -41,11 +41,11 @@ def Login(request):
 
 
 def Principal(request):
-   context = {
-      'titulo': "Principal"
-   } 
+   # context = {
+   #    'titulo': "Principal"
+   # } 
 
-   return render(request, 'principal.html', context)
+   return render(request, 'principal.html', {})
 
 #MODULO USUARIO
 #Consulta
@@ -480,7 +480,7 @@ def solicitud_consulta(request):
       'titulo'      : "Consulta de Solicitud",
       'solicitud'     : solicitud,
    } 
-   return render(request,"SolicitudConsulta.html",context)
+   return render(request,"solicitudConsulta.html",context)
 
 #Mantenimiento
 def solicitud_mante(request): 

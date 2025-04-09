@@ -9,21 +9,6 @@
     <h4 class="mb-3">Búsqueda por descripcion</h4>
 </div> 
 
-{% comment %}<div class="d-flex gap-1 justify-content-center">
-    <div class="my-3">
-        <form class="d-flex" method="GET" action="">{% csrf_token %} 
-             <div class="form-check">
-                <input id="documento" name="documento" type="radio" value="documento" class="form-check-input" checked>
-                <label class="form-check-label" for="nom_ap">Documento</label>
-            </div>
-            <div class="form-check">
-                <input id="nombre" name="nombre" type="radio" value="nombre" class="form-check-input">
-                <label class="form-check-label" for="">Nombre/Apellido</label>
-            </div> 
-        </form>    
-    </div>
-</div>{% endcomment %}
-
 <div class="px-1 py-1 my-1 text-center">
     {%include "buscador.html"%} 
 </div>
@@ -70,8 +55,8 @@
 {%endblock%}
 
 {%block botones%}
-
 <div class="d-flex gap-2 justify-content-center py-1">
     <a href="{%url 'Tipo_equipo_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
 </div>    
+{% include "botonAtras.html" %}
 {%endblock%}
