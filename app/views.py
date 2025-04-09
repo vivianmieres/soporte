@@ -66,7 +66,7 @@ def usuario_consulta(request):
          print(pk_user.username)
          return redirect('Usuario_mante_pk',pk=pk_user.id)
       else: 
-         messages.error(request,"No se selecciono a un cliente")
+         messages.error(request,"No se selecciono a un Usuario")
    context = {
       'titulo'      : "Consulta de Usuario",
       'usuario'     : usuarios
@@ -76,17 +76,22 @@ def usuario_consulta(request):
 
 #Mantenimiento
 def usuario_mante(request):
-   form = CargaUsuarioForm(request.POST or None) 
    if request.method=="POST":
-        if form.is_valid():    
-            username1 = form.data.get("username")
-            print(username1)
-            #username2 = form.cleaned_data.get("username")
-            form.save()
-            return redirect('Usuario_consulta')
-        else:
-            print(form.errors)     
-            
+      if 'Cancelar' in request.POST:
+         return redirect('Usuario_consulta')
+
+      form = CargaUsuarioForm(request.POST or None) 
+      if form.is_valid():    
+         username1 = form.data.get("username")
+         print(username1)
+         #username2 = form.cleaned_data.get("username")
+         form.save()
+         return redirect('Usuario_consulta')
+      else:
+         print(form.errors)     
+   else:
+      form = CargaUsuarioForm(request.POST or None)  
+
    context = {
       'titulo': "Mantenimiento de Usuario",
       'form'  : form,
@@ -98,6 +103,8 @@ def usuario_mante_pk(request,pk):
    usuario= models.AuthUser.objects.get(id = pk)
    form = ModifUsuarioForm(request.POST or None, instance = usuario) 
    if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Usuario_consulta')
       if form.is_valid():    
          form.save()
          return redirect('Usuario_consulta')
@@ -138,7 +145,7 @@ def usuario_consulta_pass(request):
          print(pk_user.username)
          return redirect('Usuario_mante_pass')
       else: 
-         messages.error(request,"No se selecciono a un cliente")
+         messages.error(request,"No se selecciono a un Usuario")
    context = {
       'titulo'      : "Modificar contraseña de Usuario",
       'usuario'     : usuarios
@@ -150,6 +157,8 @@ def usuario_consulta_pass(request):
 def usuario_mante_pass(request, pk):
    usuario= models.AuthUser.objects.get(id = pk)
    if request.method == 'POST':
+      if 'Cancelar' in request.POST:
+         return redirect('Usuario_consulta_pass')
       form = PasswordChangeForm(usuario, request.POST)
       if form.is_valid():
          user = form.save()
@@ -171,6 +180,8 @@ def usuario_mante_pass(request, pk):
 @login_required
 def usuario_mante_pass_login(request):
    if request.method == 'POST':
+      if 'Cancelar' in request.POST:
+         return redirect('Principal')
       print(request.user.username)
       form = PasswordChangeForm(request.user, request.POST)
       if form.is_valid():
@@ -189,7 +200,6 @@ def usuario_mante_pass_login(request):
    }
 
    return render(request,"baseMante.html",context)
-
 
 #MODULO CLIENTE
 #Consulta
@@ -228,9 +238,12 @@ def cliente_consulta(request):
 
 #Mantenimiento
 def cliente_mante(request): 
-   form = CargaClienteForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Cliente_consulta')
+      
+      form = CargaClienteForm(request.POST or None) 
+      if form.is_valid():    
          # aux1 = form.data.get("nombres")
          # aux2 = form.data.get("apellidos")
          # aux3 = form.data.get("documento")
@@ -240,10 +253,13 @@ def cliente_mante(request):
          form.save()
          return redirect('Cliente_consulta')
       else:
-         form= CargaClienteForm()     
-         messages.error("No se guardaron los datos")   
+         print(form.errors) 
+         #form= CargaClienteForm()     
+         #messages.error("No se guardaron los datos")   
          # cliente = models.Cliente.objects.get(id_cliente= pk)
          # form = CargaClienteForm(request.GET)  
+   else:
+      form = CargaClienteForm(request.POST or None) 
 
    context = {
       'titulo': "Mantenimiento de Cliente",
@@ -256,12 +272,16 @@ def cliente_mante_pk(request,pk):
    cliente= models.Cliente.objects.get(id_cliente = pk)
    form = CargaClienteForm(request.POST or None, instance = cliente) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Cliente_consulta')
+      
+      if form.is_valid():    
          form.save()
          return redirect('Cliente_consulta')
       else:
-         form= CargaClienteForm(instance = cliente)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaClienteForm(instance = cliente)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
       'titulo': "Mantenimiento de Cliente",
@@ -304,10 +324,12 @@ def equipo_consulta(request):
 
 #Mantenimiento
 def equipo_mante(request): 
-   form = CargaEquipoForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid: 
-            
+      if 'Cancelar' in request.POST:
+         return redirect('Equipo_consulta')
+      
+      form = CargaEquipoForm(request.POST or None) 
+      if form.is_valid():       
          aux1 = form.data.get("caracteristicas")
          print(aux1)
          # form_data = form.cleaned_data
@@ -315,8 +337,12 @@ def equipo_mante(request):
          form.save()
          return redirect('Equipo_consulta')
       else:
-         form= CargaEquipoForm()     
-         messages.error("No se guardaron los datos")    
+         print(form.errors)
+         #form= CargaEquipoForm()     
+         #messages.error("No se guardaron los datos") 
+   else:
+      form = CargaEquipoForm(request.POST or None)  
+
    context = {
       'titulo': "Mantenimiento de Equipo",
       'form'  : form
@@ -328,12 +354,16 @@ def equipo_mante_pk(request,pk):
    equipo = models.Equipo.objects.get(id_equipo = pk)
    form = CargaEquipoForm(request.POST or None, instance = equipo) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Equipo_consulta')
+       
+      if form.is_valid():    
          form.save()
          return redirect('Equipo_consulta')
       else:
-         form= CargaEquipoForm(instance = equipo)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaEquipoForm(instance = equipo)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
       'titulo': "Mantenimiento de Equipo",
@@ -372,9 +402,12 @@ def tipo_equipo_consulta(request):
 
 #Mantenimiento
 def tipo_equipo_mante(request): 
-   form = CargaTipoEquipoForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Tipo_equipo_consulta')
+
+      form = CargaTipoEquipoForm(request.POST or None)  
+      if form.is_valid():    
          aux1 = form.data.get("descripcion")
          print(aux1)
          # form_data = form.cleaned_data
@@ -382,8 +415,12 @@ def tipo_equipo_mante(request):
          form.save()
          return redirect('Tipo_equipo_consulta')
       else:
-         form= CargaTipoEquipoForm()     
-         messages.error("No se guardaron los datos")    
+         print(form.errors)
+         #form= CargaTipoEquipoForm()     
+         #messages.error("No se guardaron los datos") 
+   else:
+      form = CargaTipoEquipoForm(request.POST or None) 
+
    context = {
       'titulo': "Mantenimiento de Tipo de Equipo",
       'form'  : form
@@ -395,12 +432,16 @@ def tipo_equipo_mante_pk(request,pk):
    tipo_equipo = models.Tipo_equipo.objects.get(id_tipo_equipo = pk)
    form = CargaTipoEquipoForm(request.POST or None, instance = tipo_equipo) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Tipo_equipo_consulta')
+      
+      if form.is_valid():    
          form.save()
          return redirect('Tipo_equipo_consulta')
       else:
-         form= CargaTipoEquipoForm(instance = tipo_equipo)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaTipoEquipoForm(instance = tipo_equipo)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
       'titulo': "Mantenimiento de Tipo de Equipo",
@@ -443,9 +484,12 @@ def solicitud_consulta(request):
 
 #Mantenimiento
 def solicitud_mante(request): 
-   form = CargaSolicitudForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Solicitud_consulta')
+
+      form = CargaSolicitudForm(request.POST or None)  
+      if form.is_valid():    
          aux1 = form.data.get("descripcion")
          print(aux1)
          # form_data = form.cleaned_data
@@ -453,8 +497,12 @@ def solicitud_mante(request):
          form.save()
          return redirect('Solicitud_consulta')
       else:
-         form= CargaSolicitudForm()     
-         messages.error("No se guardaron los datos")    
+         print(form.errors)
+         #form= CargaSolicitudForm()     
+         #messages.error("No se guardaron los datos")    
+   else:
+      form = CargaSolicitudForm(request.POST or None) 
+
    context = {
       'titulo': "Mantenimiento de Solicitud",
       'form'  : form
@@ -466,12 +514,16 @@ def solicitud_mante_pk(request,pk):
    solicitud = models.Solicitud.objects.get(id_solicitud = pk)
    form = CargaSolicitudForm(request.POST or None, instance = solicitud) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Solicitud_consulta')
+      
+      if form.is_valid():    
          form.save()
          return redirect('Solicitud_consulta')
       else:
-         form= CargaSolicitudForm(instance = solicitud)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaSolicitudForm(instance = solicitud)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
       'titulo': "Mantenimiento de Solicitud",
@@ -509,9 +561,12 @@ def estado_consulta(request):
 
 #Mantenimiento
 def estado_mante(request): 
-   form = CargaEstadoForm(request.POST or None) 
    if request.method=="POST":
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Estado_consulta')
+      
+      form = CargaEstadoForm(request.POST or None) 
+      if form.is_valid():    
          aux1 = form.data.get("nombre")
          print(aux1)
          # form_data = form.cleaned_data
@@ -519,8 +574,12 @@ def estado_mante(request):
          form.save()
          return redirect('Estado_consulta')
       else:
-         form= CargaEstadoForm()     
-         messages.error("No se guardaron los datos")    
+         print(form.errors)
+         #form= CargaEstadoForm()     
+         #messages.error("No se guardaron los datos")  
+   else:
+      form = CargaEstadoForm(request.POST or None) 
+
    context = {
       'titulo': "Mantenimiento de Estado de Solicitud",
       'form'  : form
@@ -532,12 +591,16 @@ def estado_mante_pk(request,pk):
    estado = models.Estado.objects.get(id_estado = pk)
    form = CargaEstadoForm(request.POST or None, instance = estado) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Estado_consulta')
+       
+      if form.is_valid():    
          form.save()
          return redirect('Estado_consulta')
       else:
-         form= CargaEstadoForm(instance = estado)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaEstadoForm(instance = estado)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
       'titulo': "Mantenimiento de Estado de Solicitud",
@@ -546,7 +609,10 @@ def estado_mante_pk(request,pk):
    return render(request,"baseMante.html",context)
 
 
+
 #REPUESTO ACCESORIO
+def respuesto_acc(request):
+   return render(request,"",{}) 
 
 #tipo_repuesto_acc
 #Consulta
