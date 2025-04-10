@@ -65,14 +65,14 @@ class ModifUsuarioForm(UserChangeForm):
             'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
     }    
 
-    password = ReadOnlyPasswordHashField(
-        label= ("Contraseña"),
-        help_text= (
-            " Para cambio de contraseña ingrese "
-            '<a href="{}">AQUI</a>.'
+   # password = ReadOnlyPasswordHashField(
+    #     label= ("Contraseña"),
+    #      help_text= (
+    #          " Para cambio de contraseña ingrese "
+    #          '<a href="{% url "Usuario_mante_pass"%}">AQUI</a>.'
 
-        ),
-    )
+    #     ),
+    # )
 
 
 
