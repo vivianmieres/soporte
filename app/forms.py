@@ -55,6 +55,8 @@ class ModifUsuarioForm(UserChangeForm):
             'class':'form-control'
         })
 
+        self.fields.pop('password', None)
+
     class Meta:
         model= User
         fields= ["username","first_name","last_name", "email","is_staff","is_active","is_superuser"]
@@ -65,14 +67,6 @@ class ModifUsuarioForm(UserChangeForm):
             'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
     }    
 
-   # password = ReadOnlyPasswordHashField(
-    #     label= ("Contraseña"),
-    #      help_text= (
-    #          " Para cambio de contraseña ingrese "
-    #          '<a href="{% url "Usuario_mante_pass"%}">AQUI</a>.'
-
-    #     ),
-    # )
 
 
 
