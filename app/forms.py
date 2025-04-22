@@ -1,11 +1,11 @@
-from .models import Tipo_equipo, Cliente, Equipo, Estado, Solicitud
+from .models import Tipo_equipo, Cliente, Equipo, Estado, Solicitud,Telefono, Prestadora
 from django import forms
 from django.views.generic.edit import FormView
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, ReadOnlyPasswordHashField
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
-
+#Mantenimiento usuario
 class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,7 +38,14 @@ class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
         if len(username) < 5:
             raise forms.ValidationError("El nombre de usuario debe tener al menos 5 caracteres.")
         return username   
+		
+    def validacion(self):
+        username = self.cleaned_data.get("username")
 
+        if username == "" or username == None:
+            raise forms.ValidationError("El campo Nombre de Usuario no puede quedar vacio")
+        
+#Modificacion usuario
 class ModifUsuarioForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,7 +76,7 @@ class ModifUsuarioForm(UserChangeForm):
 
 
 
-
+#Modificacion password usuario
 class ModifPasswordForm(PasswordChangeForm): 
     class Meta:
         model= User
@@ -80,48 +87,7 @@ class ModifPasswordForm(PasswordChangeForm):
     template_name = 'usuarioPass.html'   """      
 
 
-
-# class CargaUsuarioForm(forms.ModelForm):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields["username"].widget.attrs.update({
-#             'class':'form-control'
-#         })
-#         self.fields["password"].widget.attrs.update({
-#             'class':'form-control'
-#         })
-#         self.fields["first_name"].widget.attrs.update({
-#             'class':'form-control'
-#         })
-#         self.fields["last_name"].widget.attrs.update({
-#             'class':'form-control'
-#         })
-#         self.fields["email"].widget.attrs.update({
-#             'class':'form-control'
-#         })
-#         self.fields["is_superuser"].widget.attrs.update({
-#        #     'class':'form-control'
-#         })
-#         self.fields["is_staff"].widget.attrs.update({
-#        #     'class':'form-control'
-#         })
-#         self.fields["is_active"].widget.attrs.update({
-#         #    'class':'form-control'
-#         })
-#         self.fields["is_superuser"].widget.attrs.update({
-#         #    'class':'form-control'
-#         })
-#     class Meta:
-#         model= models.AuthUser
-#         fields= ["password","username","first_name","last_name","email","is_staff","is_active","is_superuser"]
-
-#         widgets ={
-#             'username' : forms.TextInput(attrs={"size": 10, "title": "Usuario"}), 
-#             'is_staff' : forms.CheckboxInput(attrs={'class':'checkboxInvoice', "title": "Es Admin"}),
-#             'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
-#             'is_superuser': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
-#         }
-
+#Mantenimiento cliente
 class CargaClienteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -171,7 +137,77 @@ class CargaClienteForm(forms.ModelForm):
         nacionalidad = self.cleaned_data.get("nacionalidad")
         if nacionalidad == "" or nacionalidad == None:
             raise forms.ValidationError("El campo Nacionalidad no puede quedar vacio")
+
+#Mantenimiento telefono        
+class CargaTelefonoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        id_cliente = forms.ModelChoiceField(queryset= Cliente.objects.all())
+        id_prestadora = forms.ModelChoiceField(queryset= Prestadora.objects.all())
         
+        self.fields["prefijo"].widget.attrs.update({
+            'class':'form-control'
+        })
+        self.fields["numero"].widget.attrs.update({
+            'class':'form-control'
+        })
+      
+    class Meta:
+        model= Telefono
+        fields= ["id_telefono","id_cliente","id_prestadora","prefijo","numero","principal","activo"]
+        labels = {
+            'id_cliente'    : 'Cliente',
+            'id_prestadora' : 'Prestadora'
+        }    
+
+    widgets ={
+       'principal': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+       'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+    }  
+
+    def validacion(self):
+        Cliente = self.cleaned_data.get("id_cliente")
+        if Cliente == None:
+            raise forms.ValidationError("El campo Cliente no puede quedar vacio")  
+
+        Prestadora = self.cleaned_data.get("id_prestadora")
+        if Prestadora == None:
+            raise forms.ValidationError("El campo Prestadora no puede quedar vacio")   
+    
+        prefijo = self.cleaned_data.get("prefijo")
+        if prefijo == "" or prefijo == None:
+            raise forms.ValidationError("El campo Prefijo no puede quedar vacio")  
+         
+        numero = self.cleaned_data.get("numero")
+        if numero == "" or numero == None:
+            raise forms.ValidationError("El campo Numero no puede quedar vacio")     
+        
+#Mantenimiento prestadora        
+class CargaPrestadoraForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["empresa"].widget.attrs.update({
+            'class':'form-control'
+        })
+            
+    class Meta:
+        model= Prestadora
+        fields= ["empresa","activo"]
+        error_messages = {
+            "empresa": { "unique": "Esta empresa ya se cargo anteriormente."}
+        }        
+
+    widgets ={
+             'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        }    
+
+    def validacion(self):
+        empresa = self.cleaned_data.get("empresa")
+        if empresa == "" or empresa == None:
+            raise forms.ValidationError("El campo Empresa no puede quedar vacio")        
+                   
+#Mantenimiento tipo equipo        
 class CargaTipoEquipoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -193,7 +229,7 @@ class CargaTipoEquipoForm(forms.ModelForm):
         descrip = self.cleaned_data.get("descripcion")
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Descripcion no puede quedar vacio")
-        
+#Mantenimiento equipo 
 class CargaEquipoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -233,7 +269,7 @@ class CargaEquipoForm(forms.ModelForm):
         caract = self.cleaned_data.get("descripcion")
         if caract == "" or caract == None:
             raise forms.ValidationError("El campo Descripción no puede quedar vacio")    
-
+#Mantenimiento estado
 class CargaEstadoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -258,7 +294,7 @@ class CargaEstadoForm(forms.ModelForm):
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Nombre no puede quedar vacio")
 
-
+#Mantenimiento solicitud
 class CargaSolicitudForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

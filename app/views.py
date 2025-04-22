@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 #from .usuarioForm import UsuarioFormulario
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
+from .forms import CargaTelefonoForm, CargaPrestadoraForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm
 from . import models
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
@@ -206,7 +207,10 @@ def usuario_mante_pass_login(request):
 def cliente_consulta(request):
    clientes = []
    clientes = models.Cliente.objects.all()
-  # tipo_busqueda = 
+
+   for cliente in clientes:
+      cliente.telefono_principal = cliente.telefono_set.filter(activo=True, principal=True).first()
+     
    if request.method=="GET":
         #tipo_busqueda = request.GET.get()
       busqueda = request.GET.get("buscar")
@@ -222,7 +226,7 @@ def cliente_consulta(request):
    elif request.method=="POST":
       cliente_seleccionado= request.POST.get("cliente_seleccionado",False)
       if cliente_seleccionado != False:
-         pk_cliente = models.Cliente.objects.get(documento=cliente_seleccionado)
+         pk_cliente = models.Cliente.objects.get(id_cliente = cliente_seleccionado)
          print(pk_cliente.id_cliente)
          return redirect('Cliente_mante_pk',pk=pk_cliente.id_cliente)
       else: 
@@ -289,12 +293,158 @@ def cliente_mante_pk(request,pk):
    } 
    return render(request,"baseMante.html",context)
 
+#Telefono
+#Consulta telefono
+def telefono_consulta(request):
+   telefonos = []
+   telefonos = models.Telefono.objects.all().order_by('id_telefono')
+   if request.method=="GET":
+       
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+        #if request.GET.nombre:
+            #busca por nombre, apellido
+      if busqueda:      
+         # telefonos = (models.Telefono.objects.filter(prefijo__icontains = busqueda) or
+         #             models.Telefono.objects.filter(numero__icontains = busqueda))
+         telefonos = models.Telefono.objects.filter(Q(id_cliente__nombres__icontains=busqueda) |
+                                                    Q(id_cliente__apellidos__icontains=busqueda) |
+                                                    Q(prefijo__icontains=busqueda) |
+                                                    Q(numero__icontains=busqueda)).order_by('id_telefono')
+   elif request.method=="POST":
+      telefono_seleccionado= request.POST.get("telefono_seleccionado",False)
+      print(telefono_seleccionado)
+      if telefono_seleccionado != False:
+         pk_telefono = models.Telefono.objects.get(id_telefono = telefono_seleccionado)
+         print(pk_telefono.id_telefono)
+         return redirect('Telefono_mante_pk',pk=pk_telefono.id_telefono)
+      else: 
+         messages.error(request,"No se selecciono un telefono")
+
+   context = {
+      'titulo'      : "Consulta de telefono de Cliente",
+      'telefono'     : telefonos,
+   } 
+   return render(request,"telefonoConsulta.html",context)  
+
+
+#Mantenimiento telefono
+def telefono_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Telefono_consulta')
+      
+      form = CargaTelefonoForm(request.POST or None) 
+      if form.is_valid():    
+         form.save()
+         return redirect('Telefono_consulta')
+      else:
+         print(form.errors) 
+   else:
+      form = CargaTelefonoForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de Telefonos de Cliente",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Modificacion telefono
+def telefono_mante_pk(request,pk): 
+   telefono = models.Telefono.objects.get(id_telefono = pk)
+   form = CargaTelefonoForm(request.POST or None, instance = telefono) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Telefono_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Telefono_consulta')
+      else:
+         print(form.errors)
+        
+   context = {
+      'titulo': "Mantenimiento de Telefono de Cliente",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Prestadora
+#Consulta prestadora
+def prestadora_consulta(request):
+   prestadora = []
+   prestadora = models.Prestadora.objects.all().order_by('id_prestadora')
+   print(prestadora)
+   if request.method=="GET":
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+      if busqueda:      
+         prestadora = (models.Prestadora.objects.filter(empresa__icontains = busqueda))
+      print(prestadora)
+   elif request.method=="POST":
+      prestadora_seleccionado= request.POST.get("prestadora_seleccionado",False)
+      print(prestadora_seleccionado)
+      if prestadora_seleccionado != False:
+         pk_prestadora = models.Prestadora.objects.get(empresa = prestadora_seleccionado)
+         print(pk_prestadora.id_prestadora)
+         return redirect('Prestadora_mante_pk',pk=pk_prestadora.id_prestadora)
+      else: 
+         messages.error(request,"No se selecciono ninguna prestadora")
+
+   context = {
+      'titulo'      : "Consulta de Prestadora",
+      'prestadora'     : prestadora,
+   } 
+   return render(request,"prestadoraConsulta.html",context)
+
+#Mantenimiento prestadora
+def prestadora_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Prestadora_consulta')
+
+      form = CargaPrestadoraForm(request.POST or None)  
+      if form.is_valid():    
+         aux1 = form.data.get("empresa")
+         print(aux1)
+         form.save()
+         return redirect('Prestadora_consulta')
+      else:
+         print(form.errors)
+   else:
+      form = CargaPrestadoraForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de Prestadora",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Modificacion prestadora
+def prestadora_mante_pk(request,pk): 
+   prestadora = models.Prestadora.objects.get(id_prestadora = pk)
+   form = CargaPrestadoraForm(request.POST or None, instance = prestadora) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Prestadora_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Prestadora_consulta')
+      else:
+         print(form.errors)
+        
+   context = {
+      'titulo': "Mantenimiento de Prestadora",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
 #MODULO EQUIPO
 def equipo(request):
    return render(request,"",{}) 
 
 #Equipo
-#Consulta
+#Consulta equipo
 def equipo_consulta(request):
    equipo = []
    equipo = models.Equipo.objects.select_related('id_tipo_equipo','id_cliente').all()
@@ -610,7 +760,7 @@ def estado_mante_pk(request,pk):
 
 
 
-#REPUESTO ACCESORIO
+# MODULO REPUESTO ACCESORIO
 def respuesto_acc(request):
    return render(request,"",{}) 
 
@@ -618,8 +768,8 @@ def respuesto_acc(request):
 #Consulta
 def tipo_repuesto_acc_consulta(request):
    tipo_repuesto_acc = []
-   tipo_equipo = models.Estado.objects.all()
-   print(estado)
+   tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.all()
+   print(tipo_repuesto_acc)
    if request.method=="GET":
       busqueda = request.GET.get("buscar")
       print(busqueda)

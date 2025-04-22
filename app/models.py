@@ -151,7 +151,7 @@ class Cliente(models.Model):
 
 class Prestadora(models.Model):
     id_prestadora = models.AutoField(primary_key=True)
-    empresa = models.CharField(max_length=100)
+    empresa = models.CharField(max_length=100, unique= True)
     activo = models.BooleanField()
 
     def __str__(self) -> str:
@@ -173,7 +173,7 @@ class Telefono(models.Model):
     activo = models.BooleanField()
 
     def __str__(self) -> str:
-         return str('('+self.prefijo +') ' + self.numero)
+        return '('+  str(self.prefijo) +') ' +  str(self.numero)
     
 
     class Meta:

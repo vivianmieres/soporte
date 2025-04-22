@@ -6,7 +6,7 @@
 
 {%block busqueda %}
 <div class="d-flex gap-2 justify-content-center py-1">
-    <h4 class="mb-3">Búsqueda por Nombre/Apellido</h4>
+    <h4 class="mb-3">Búsqueda por Cliente o Teléfono</h4>
 </div> 
 
 <div class="px-1 py-1 my-1 text-center">
@@ -29,33 +29,21 @@
                 <thead class="table-primary">
                     <tr>
                     <th scope="col"></th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Documento</th>
                     <th scope="col">Telefono</th>
+                    <th scope="col">Cliente</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {%for obj in cliente%}
+                    {%for obj in telefono%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj.id_cliente}}" name="cliente_seleccionado">
+                        <input type="radio" value="{{obj.id_telefono}}" name="telefono_seleccionado">
                     </td> 
                     <td>
-                        {{obj.nombres}} 
+                        ({{obj.prefijo}}) {{obj.numero}} 
                     </td>
                     <td>
-                        {{obj.apellidos}} 
-                    </td>
-                    <td>
-                        {{obj.documento}} 
-                    </td>
-                    <td>
-                        {% if obj.telefono_principal %}
-                            ({{ obj.telefono_principal.prefijo }}) {{ obj.telefono_principal.numero }}
-                        {% else %}
-                            Sin teléfono
-                        {% endif %}
+                        {{obj.id_cliente.nombres}} {{obj.id_cliente.apellidos}} 
                     </td>
                     </tr>                
                     {% empty %}
@@ -71,8 +59,9 @@
 {%endblock%}
 
 {%block botones%}
+
 <div class="d-flex gap-2 justify-content-center py-1">
-    <a href="{%url 'Cliente_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
-</div>  
-{% include "botonAtras.html" %}  
+    <a href="{%url 'Telefono_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
+</div>   
+{% include "botonAtras.html" %} 
 {%endblock%}
