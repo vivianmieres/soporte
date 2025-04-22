@@ -60,8 +60,16 @@ urlpatterns = [
    path('solicitud/solicitud_mante/', views.solicitud_mante, name= 'Solicitud_mante'),
    path('solicitud/solicitud_mante_pk/<str:pk>', views.solicitud_mante_pk, name= 'Solicitud_mante_pk'),     
    path('solicitud/estado_consulta/', views.estado_consulta, name= 'Estado_consulta'),
-   path('solicitud/estado_mante/', views.estado_mante, name= 'Estado_mante'),   
-   path('solicitud/estado_mante_pk/<str:pk>', views.estado_mante_pk, name= 'Estado_mante_pk')                                                                   
+   path('solicitud/estado_mante/', views.estado_mante, name= 'Estado_mante'),
+   path('solicitud/estado_mante_pk/<str:pk>', views.estado_mante_pk, name= 'Estado_mante_pk'),     
+   #modulo repuesto/accesorio
+   path('repuesto_acc/',views.respuesto_acc, name='Repuesto_acc'),
+   #path('equipo/repuesto_acc_consulta/', views.equipo_consulta, name= 'Equipo_consulta'),
+   #path('equipo/equipo_mante/', views.equipo_mante, name= 'Equipo_mante'),
+   #path('equipo/equipo_mante_pk/<str:pk>', views.equipo_mante_pk, name= 'Equipo_mante_pk'),
+   path('repuesto_acc/tipo_repuesto_acc_consulta/', views.tipo_repuesto_acc_consulta, name= 'Tipo_repuesto_acc_consulta'),
+   path('repuesto_acc/tipo_repuesto_acc_mante/', views.tipo_repuesto_acc_mante, name= 'Tipo_repuesto_acc_mante'),
+   path('repuesto_acc/tipo_repuesto_acc_mante_pk/<str:pk>', views.tipo_repuesto_acc_mante_pk, name= 'Tipo_repuesto_acc_mante_pk')                                                             
 ]
 
 

@@ -101,7 +101,8 @@ def usuario_mante(request):
 
 #Modificacion
 def usuario_mante_pk(request,pk): 
-   usuario= models.AuthUser.objects.get(id = pk)
+   #usuario= models.AuthUser.objects.get(id = pk)
+   usuario= User.objects.get(id = pk)
    form = ModifUsuarioForm(request.POST or None, instance = usuario) 
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
@@ -630,7 +631,7 @@ def solicitud_consulta(request):
       'titulo'      : "Consulta de Solicitud",
       'solicitud'     : solicitud,
    } 
-   return render(request,"solicitudConsulta.html",context)
+   return render(request,"SolicitudConsulta.html",context)
 
 #Mantenimiento
 def solicitud_mante(request): 
