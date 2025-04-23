@@ -333,3 +333,26 @@ class CargaSolicitudForm(forms.ModelForm):
         descripicion = self.cleaned_data.get("descripcion")
         if estado == None:
             raise forms.ValidationError("El campo Descripcion no puede quedar vacio") 
+
+#Mantenimiento tipo repuesto accesorio        
+class CargaTipoRepuestoAccForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+       
+        self.fields["nombre"].widget.attrs.update({
+            'class':'form-control'
+        })
+      
+    class Meta:
+        model= Estado
+        fields= ["nombre","activo"]
+ 
+    widgets ={
+             'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        }  
+
+    def validacion(self):
+        descrip = self.cleaned_data.get("nombre")
+        if descrip == "" or descrip == None:
+            raise forms.ValidationError("El campo Nombre no puede quedar vacio")  
+        

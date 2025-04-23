@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 #from .usuarioForm import UsuarioFormulario
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
 from .forms import CargaTelefonoForm, CargaPrestadoraForm
-from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm
+from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -631,7 +631,7 @@ def solicitud_consulta(request):
       'titulo'      : "Consulta de Solicitud",
       'solicitud'     : solicitud,
    } 
-   return render(request,"SolicitudConsulta.html",context)
+   return render(request,"solicitudConsulta.html",context)
 
 #Mantenimiento
 def solicitud_mante(request): 
@@ -757,9 +757,8 @@ def estado_mante_pk(request,pk):
       'titulo': "Mantenimiento de Estado de Solicitud",
       'form'  : form
    } 
+
    return render(request,"baseMante.html",context)
-
-
 
 # MODULO REPUESTO ACCESORIO
 def respuesto_acc(request):
@@ -775,58 +774,69 @@ def tipo_repuesto_acc_consulta(request):
       busqueda = request.GET.get("buscar")
       print(busqueda)
       if busqueda:      
-         estado = (models.Estado.objects.filter(nombre__icontains = busqueda))
-      print(estado)
+         tipo_repuesto_acc = (models.Tipo_respuesto_acc.objects.filter(nombre__icontains = busqueda))
+      print(tipo_repuesto_acc)
    elif request.method=="POST":
-      estado_seleccionado= request.POST.get("estado_seleccionado",False)
-      print(estado_seleccionado)
-      if estado_seleccionado != False:
-         pk_estado = models.Estado.objects.get(nombre = estado_seleccionado)
-         print(pk_estado.id_estado)
-         return redirect('Estado_mante_pk',pk=pk_estado.id_estado)
+      tipo_repuesto_acc_seleccionado= request.POST.get("tipo_repuesto_acc_seleccionado",False)
+      print(tipo_repuesto_acc_seleccionado)
+      if tipo_repuesto_acc_seleccionado != False:
+         pk_tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.get(nombre = tipo_repuesto_acc_seleccionado)
+         print(pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
+         return redirect('Tipo_repuesto_acc_mante_pk',pk=pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
       else: 
-         messages.error(request,"No se selecciono ninguna Solicitud")
+         messages.error(request,"No se selecciono ningun tipo de respuesto/accesorio")
 
    context = {
-      'titulo'      : "Consulta de Estado",
-      'estado'     : estado,
+      'titulo'                : "Consulta de Tipo de Respuesto/Accesorio",
+      'tipo_repuesto_acc'     : tipo_repuesto_acc,
    } 
-   return render(request,"EstadoConsulta.html",context)
+   return render(request,"tipoRepuestoAccConsulta.html",context)
 
 #Mantenimiento
-def estado_mante(request): 
-   form = CargaEstadoForm(request.POST or None) 
+def tipo_repuesto_acc_mante(request): 
    if request.method=="POST":
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Tipo_repuesto_acc_consulta')
+      
+      form = CargaTipoRepuestoAccForm(request.POST or None) 
+      if form.is_valid():    
          aux1 = form.data.get("nombre")
          print(aux1)
          # form_data = form.cleaned_data
          # print(form_data)
          form.save()
-         return redirect('Estado_consulta')
+         return redirect('Tipo_repuesto_acc_consulta')
       else:
-         form= CargaEstadoForm()     
-         messages.error("No se guardaron los datos")    
+         print(form.errors)
+         #form= CargaTipoRepuestoAccForm()     
+         #messages.error("No se guardaron los datos")   
+   else:
+      form = CargaTipoRepuestoAccForm(request.POST or None) 
+
    context = {
-      'titulo': "Mantenimiento de Estado de Solicitud",
+      'titulo': "Mantenimiento de Tipo de Repuesto y Accesorio",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
 
 #Modificacion
-def estado_mante_pk(request,pk): 
-   estado = models.Estado.objects.get(id_estado = pk)
-   form = CargaEstadoForm(request.POST or None, instance = estado) 
+def tipo_repuesto_acc_mante_pk(request,pk): 
+   tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
+   form = CargaTipoRepuestoAccForm(request.POST or None, instance = tipo_repuesto_acc) 
    if request.method=="POST": 
-      if form.is_valid:    
+      if 'Cancelar' in request.POST:
+         return redirect('Tipo_repuesto_acc_consulta')
+      
+      if form.is_valid():    
          form.save()
-         return redirect('Estado_consulta')
+         return redirect('Tipo_repuesto_acc_consulta')
       else:
-         form= CargaEstadoForm(instance = estado)     
-         messages.error("No se guardaron los datos")   
+         print(form.errors)
+         #form= CargaTipoRepuestoAccForm(instance = tipo_repuesto_acc)     
+         #messages.error("No se guardaron los datos")   
 
    context = {
-      'titulo': "Mantenimiento de Estado de Solicitud",
+      'titulo': "Mantenimiento de Repuesto y Accesorio",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
@@ -871,7 +881,3 @@ def usuario_mante_pass(request):
       'form'  : form
    } 
    return render(request, 'usuarioPass.html', context) """
-
-
-
-
