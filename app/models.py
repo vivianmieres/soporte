@@ -140,7 +140,7 @@ class Cliente(models.Model):
     direccion = models.CharField(blank=True, null=True)
 
     def __str__(self) -> str:
-         return str(self.documento)
+        return f"{self.nombres} {self.apellidos}"
     
 
     class Meta:
@@ -231,7 +231,7 @@ class Solicitud(models.Model):
     id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='id_estado') 
     descripcion = models.CharField(max_length=150)
     fecha_ingreso = models.DateField()
-    fecha_cierre = models.DateField()
+    fecha_cierre = models.DateField(null= True, blank=True)
 
     def __str__(self) -> str:
          return str(self.id_solicitud)

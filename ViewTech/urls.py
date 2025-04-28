@@ -19,7 +19,7 @@ from django.urls import path
 from app import views
 from django.conf import settings
 from django.conf.urls.static import static
-from app.views import usuario_mante_pass
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -58,6 +58,7 @@ urlpatterns = [
    path('solicitud/',views.solicitud, name='Solicitud'),         
    path('solicitud/solicitud_consulta/', views.solicitud_consulta, name= 'Solicitud_consulta'),
    path('solicitud/solicitud_mante/', views.solicitud_mante, name= 'Solicitud_mante'),
+   path('select2/', include('django_select2.urls')),
    path('solicitud/solicitud_mante_pk/<str:pk>', views.solicitud_mante_pk, name= 'Solicitud_mante_pk'),     
    path('solicitud/estado_consulta/', views.estado_consulta, name= 'Estado_consulta'),
    path('solicitud/estado_mante/', views.estado_mante, name= 'Estado_mante'),

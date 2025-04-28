@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Password
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
+from django_select2.forms import ModelSelect2Widget
+import datetime
 #Mantenimiento usuario
 class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -294,13 +296,45 @@ class CargaEstadoForm(forms.ModelForm):
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Nombre no puede quedar vacio")
 
+#widget del equipo de un cliente
+class EquipoWidget(ModelSelect2Widget):
+    model = Equipo
+    search_fields = [
+        "id_cliente__nombres__icontains",
+        "id_cliente__apellidos__icontains",
+        "id_tipo_equipo__descripcion",
+    ]
+
+    def label_from_instance(self, obj):
+        return f"{obj.id_cliente.nombres} {obj.id_cliente.apellidos}-{obj.id_tipo_equipo.descripcion} {obj.marca} {obj.modelo}"
 #Mantenimiento solicitud
 class CargaSolicitudForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        id_equipo = forms.ModelChoiceField(queryset= Equipo.objects.all())
-        id_estado = forms.ModelChoiceField(queryset= Estado.objects.all())
 
+        self.fields['id_equipo'].widget.attrs.update({
+            'class': 'form-control select2-custom'
+        })
+
+        #filtrar los estados activos y ordenar por id_estado
+        self.fields["id_estado"].queryset = Estado.objects.filter(activo=True).order_by('id_estado')
+
+        #mostrar id-nombre
+        self.fields["id_estado"].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
+
+        #Seleccionar por defecto estado "Abierto"
+        estado_abierto = Estado.objects.filter(nombre__iexact="Abierto", activo=True).first()
+        if estado_abierto:
+            self.fields["id_estado"].initial = estado_abierto.id_estado
+
+        #Fecha de hoy por defecto para fecha de ingreso
+        self.fields["fecha_ingreso"].initial = datetime.date.today()    
+
+      
+        #Estilos de boostrap
+        self.fields["id_estado"].widget.attrs.update({
+            'class': 'form-control'
+        })
 
         self.fields["descripcion"].widget.attrs.update({
             'class':'form-control'
@@ -315,11 +349,13 @@ class CargaSolicitudForm(forms.ModelForm):
     class Meta:
         model= Solicitud
         fields= ["id_equipo","id_estado","descripcion","fecha_ingreso","fecha_cierre"]
+        widgets = {
+            'id_equipo': EquipoWidget
+        } 
         labels = {
-            'id_equipo': 'Equipo',
+            'id_equipo': 'Equipo de un Cliente',
             'id_estado': 'Estado'
         }    
-
 
     def validacion(self):
         equipo = self.cleaned_data.get("id_equipo")
@@ -333,6 +369,23 @@ class CargaSolicitudForm(forms.ModelForm):
         descripicion = self.cleaned_data.get("descripcion")
         if estado == None:
             raise forms.ValidationError("El campo Descripcion no puede quedar vacio") 
+			
+    def clean(self):
+        cleaned_data = super().clean()
+        estado = cleaned_data.get("id_estado")
+        fecha_cierre = cleaned_data.get("fecha_cierre")
+
+        # Verificamos si el estado se llama 'Cerrado'
+        if estado and estado.nombre.lower() != 'cerrado' and fecha_cierre:
+            raise forms.ValidationError("La fecha de cierre solo se puede completar si el estado es 'Cerrado'.")
+        
+         # Si está en 'Cerrado' pero no tiene fecha de cierre, podría obligarlo
+        if estado and estado.nombre.lower() == 'cerrado' and not fecha_cierre:
+            raise forms.ValidationError("Debe completar la fecha de cierre para un estado 'Cerrado'.")
+
+        return cleaned_data
+
+
 
 #Mantenimiento tipo repuesto accesorio        
 class CargaTipoRepuestoAccForm(forms.ModelForm):
