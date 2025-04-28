@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            "ALTER TABLE app_solicitud RENAME TO solicitud;",
-        )
+        #migrations.RunSQL(
+            #"ALTER TABLE app_solicitud RENAME TO solicitud;",
+        #)
     ]
