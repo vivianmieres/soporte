@@ -1,9 +1,11 @@
 {% load static %}
-
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
-<head><script src="{% static 'js/color-modes.js'%}"></script>
-
+<head>
+  <script src="{% static 'js/color-modes.js'%}"></script>
+  <script src="{% static 'js/jquery-3.6.0.min.js'%}"></script>
+  <script src= "{% static 'js/htmx.min.js'%}"></script>
+    {{ form.media }}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -15,14 +17,15 @@
 
 
     <link rel="stylesheet" href="{% static 'css/css@3.css'%}">
+    
 
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" integrity_="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     
         <!-- Favicons -->
     <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
     <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="manifest" href="{% static 'js/manifest.json'%}">
+    <link rel="manifest" href="{% static 'json/manifest.json'%}">
     <link rel="mask-icon" href="/docs/5.3/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
     <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon.ico">
     <meta name="theme-color" content="#712cf9">
@@ -104,14 +107,22 @@
         .bd-mode-toggle .dropdown-menu .active .bi {
           display: block !important;
         }
+
+        .select2-container {
+          width: 100% !important;
+        }
+        .select2-selection--single {
+          height: 38px; /* ajustalo a tu Bootstrap */
+          padding: 6px 12px;
+        }
       </style>
 
       <!-- Custom styles for this template -->
     <link href="{% static 'css/navbar-static.css'%}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap.min.css'%}" rel="stylesheet" integrity_="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="{% static 'css/bootstrap.min.css'%}" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>{{titulo}}</title>  
   </head>
-  <body>
+  <body hx-boost="true">
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -128,21 +139,59 @@
       </symbol>
     </svg>
 
+    <link rel="stylesheet" href={% static 'css/bootstrap-datepicker.min.css'%}/>
+    <script src={% static 'js/bootstrap-datepicker.min.js'%}></script>
+    <script src={% static 'js/bootstrap-datepicker.es.min.js' %}></script>
+    <script scr={% static 'js/fecha_cierre.js' %}></script>
 
+    <script>
+      $(document).ready(function () {
+        $('#id_fecha_ingreso, #id_fecha_cierre').datepicker({
+          format: 'dd/mm/yyyy',
+          language: 'es',
+          autoclose: true,
+          todayHighlight: true
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const estadoField = document.querySelector('[name="id_estado"]');
+          const fechaCierreField = document.getElementById("id_fecha_cierre");
+      
+          function toggleFechaCierre() {
+              const selectedText = estadoField.options[estadoField.selectedIndex].text.toLowerCase();
+              
+              if (selectedText.includes('cerrado')) {  // Ahora busca si el texto contiene "cerrado"
+                  fechaCierreField.parentElement.style.display = "block";
+                  fechaCierreField.disabled = false;
+              } else {
+                  fechaCierreField.parentElement.style.display = "none";
+                  fechaCierreField.value = "";
+                  fechaCierreField.disabled = true;
+              }
+          }
+      
+          estadoField.addEventListener("change", toggleFechaCierre);
+      
+          toggleFechaCierre(); // llamada inicial para ocultar o mostrar según corresponda
+      });
+      </script>
+    
     {%block incluir_navbar%}
     {%endblock%}
 
+    
+
     <main class="container"> 
+      {% comment %} <link href="{% static 'css/base.css'%}" rel="stylesheet"> {% endcomment %}
       <div class="px-2 py-2 my-2 text-center">
           <h1 class="display-8 fw-bold text-body-emphasis">Sistema de Gestión de Soporte Técnico</h1>   
       </div> 
       <div class="px-4 py-2 my-2 text-center">
         <h1 class="display-8 fw-bold text-body-emphasis">{{titulo}}</h1>
       </div>         
-
-        {% comment %}{%block titulo%}
-        {%endblock%} {% endcomment %} 
-
   
         {%block imagen%}
         {%endblock%}
@@ -167,7 +216,6 @@
    {% comment %}  {%block cerrar_sesion%}
     {%endblock%} {% endcomment %}
 
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}" integrity_="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>     
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>     
   </body>
 </html>
-    
