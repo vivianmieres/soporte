@@ -14,12 +14,15 @@
         <div class="container col- col-md-3 border p-3">
             <form  method= "POST" action="">{% csrf_token %}
                 {{form.as_p}}
-                <div class=" text-end">
-                <input type="submit" class="btn btn-primary" value="Guardar">
-                <div class=" text-start">
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <input type="submit" name="Cancelar" class="btn btn-primary" value="Cancelar">
+                    <input type="submit" name="Guardar" class="btn btn-primary" value="Guardar">
+                </div>
             </from>
           </div>
           
     </div>
 </div>
+{% include "botonAtras.html" %}
 {%endblock%}

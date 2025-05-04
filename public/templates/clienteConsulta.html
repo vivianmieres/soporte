@@ -9,21 +9,6 @@
     <h4 class="mb-3">Búsqueda por Nombre/Apellido</h4>
 </div> 
 
-{% comment %}<div class="d-flex gap-1 justify-content-center">
-    <div class="my-3">
-        <form class="d-flex" method="GET" action="">{% csrf_token %} 
-             <div class="form-check">
-                <input id="documento" name="documento" type="radio" value="documento" class="form-check-input" checked>
-                <label class="form-check-label" for="nom_ap">Documento</label>
-            </div>
-            <div class="form-check">
-                <input id="nombre" name="nombre" type="radio" value="nombre" class="form-check-input">
-                <label class="form-check-label" for="">Nombre/Apellido</label>
-            </div> 
-        </form>    
-    </div>
-</div>{% endcomment %}
-
 <div class="px-1 py-1 my-1 text-center">
     {%include "buscador.html"%} 
 </div>
@@ -47,13 +32,14 @@
                     <th scope="col">Nombre</th>
                     <th scope="col">Apellido</th>
                     <th scope="col">Documento</th>
+                    <th scope="col">Telefono</th>
                     </tr>
                 </thead>
                 <tbody>
                     {%for obj in cliente%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj}}" name="cliente_seleccionado">
+                        <input type="radio" value="{{obj.id_cliente}}" name="cliente_seleccionado">
                     </td> 
                     <td>
                         {{obj.nombres}} 
@@ -63,6 +49,13 @@
                     </td>
                     <td>
                         {{obj.documento}} 
+                    </td>
+                    <td>
+                        {% if obj.telefono_principal %}
+                            ({{ obj.telefono_principal.prefijo }}) {{ obj.telefono_principal.numero }}
+                        {% else %}
+                            Sin teléfono
+                        {% endif %}
                     </td>
                     </tr>                
                     {% empty %}
@@ -78,28 +71,8 @@
 {%endblock%}
 
 {%block botones%}
-{% comment %} <div class="d-flex gap-2 justify-content-center py-5">
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Nuevo
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Grabar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Editar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-      Inactivar
-      <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-right-short"/></svg>
-    </button>
-</div> {% endcomment %}
-
 <div class="d-flex gap-2 justify-content-center py-1">
-    <a href="{%url 'Cliente_mante'%}" class="btn btn-outline-secondary d-inline-flex align-items-center" type="button">
-        Nuevo Registro
-    </a>
-</div>    
+    <a href="{%url 'Cliente_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
+</div>  
+{% include "botonAtras.html" %}  
 {%endblock%}

@@ -6,7 +6,7 @@
 
 {%block busqueda %}
 <div class="d-flex gap-2 justify-content-center py-1">
-    <h4 class="mb-3">Búsqueda por Usuario</h4>
+    <h4 class="mb-3">Búsqueda por Prestadora</h4>
 </div> 
 
 <div class="px-1 py-1 my-1 text-center">
@@ -29,34 +29,30 @@
                 <thead class="table-primary">
                     <tr>
                     <th scope="col"></th>
-                    <th scope="col">Usuario</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
+                    <th scope="col">Nro.</th>
+                    <th scope="col">Empresa</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {%for obj in usuario%}
+                    {%for obj in prestadora%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj}}" name="user_seleccionado">
+                        <input type="radio" value="{{obj}}" name="prestadora_seleccionado">
                     </td> 
                     <td>
-                        {{obj.username}} 
+                        {{obj.id_prestadora}} 
                     </td>
                     <td>
-                        {{obj.first_name}} 
-                    </td>
-                    <td>
-                        {{obj.last_name}} 
+                        {{obj.empresa}} 
                     </td>
                     </tr>                
                     {% empty %}
-                    <p>No hay registros</p>
+                    <p>No hay registros.</p>
                     {%endfor%} 
                 </tbody>
             </table>                                          
-            <input type="submit" class="btn btn-primary" value="Modificar">
-        </form>      
+            <input type="submit" class="btn btn-primary" value="Modificar"> 
+        </form>     
     </div>
 </div>
 
@@ -65,7 +61,7 @@
 {%block botones%}
 
 <div class="d-flex gap-2 justify-content-center py-1">
-    <a href="{% url 'Usuario_mante' %}" class="btn btn-lg btn-primary">Nuevo Registro</a>
-</div>
-{% include "botonAtras.html" %}
+    <a href="{%url 'Prestadora_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
+</div>   
+{% include "botonAtras.html" %} 
 {%endblock%}
