@@ -29,33 +29,33 @@
                 <thead class="table-primary">
                     <tr>
                     <th scope="col"></th>
-                    <th scope="col">Nro. solicitud</th>
+                    <th scope="col">Solicitud</th>
                     <th scope="col">Equipo</th>
-                    <th scope="col">Estado</th>
                     <th scope="col">Cliente</th>
                     <th scope="col">Ingreso</th>
+                    <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     {%for obj in solicitud%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj}}" name="solicitud_seleccionado">
+                        <input type="radio" value="{{obj.id_solicitud}}" name="solicitud_seleccionado">
                     </td> 
                     <td>
                         {{obj.id_solicitud}} 
                     </td>
                     <td>
-                        {{obj.id_equipo.descripcion}}
+                        {{obj.id_equipo.descripcion}} {{obj.id_equipo.marca}} {{obj.id_equipo.modelo}}
                     </td>
                     <td>
-                        {{obj.id_estado.nombre}} 
-                    </td>
-                    <td>
-                        {{obj.id_equipo.id_cliente.nombre}} 
+                        {{obj.id_equipo.id_cliente.nombres}} {{obj.id_equipo.id_cliente.apellidos}}
                     </td>
                     <td>
                         {{obj.fecha_ingreso}} 
+                    </td>
+                    <td>
+                        {{obj.id_estado.nombre}} 
                     </td>
                     </tr>                
                     {% empty %}

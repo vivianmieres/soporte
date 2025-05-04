@@ -621,7 +621,7 @@ def solicitud_consulta(request):
       solicitud_seleccionado= request.POST.get("solicitud_seleccionado",False)
       print(solicitud_seleccionado)
       if solicitud_seleccionado != False:
-         pk_solicitud = models.Solicitud.objects.get(descripcion= solicitud_seleccionado)
+         pk_solicitud = models.Solicitud.objects.get(id_solicitud = solicitud_seleccionado)
          print(pk_solicitud.id_solicitud)
          return redirect('Solicitud_mante_pk',pk=pk_solicitud.id_solicitud)
       else: 
@@ -631,7 +631,7 @@ def solicitud_consulta(request):
       'titulo'      : "Consulta de Solicitud",
       'solicitud'     : solicitud,
    } 
-   return render(request,"SolicitudConsulta.html",context)
+   return render(request,"solicitudConsulta.html",context)
 
 #Mantenimiento
 def solicitud_mante(request): 
@@ -698,7 +698,7 @@ def estado_consulta(request):
       estado_seleccionado= request.POST.get("estado_seleccionado",False)
       print(estado_seleccionado)
       if estado_seleccionado != False:
-         pk_estado = models.Estado.objects.get(nombre = estado_seleccionado)
+         pk_estado = models.Estado.objects.get(id_estado = estado_seleccionado)
          print(pk_estado.id_estado)
          return redirect('Estado_mante_pk',pk=pk_estado.id_estado)
       else: 

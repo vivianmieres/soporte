@@ -307,6 +307,7 @@ class EquipoWidget(ModelSelect2Widget):
 
     def label_from_instance(self, obj):
         return f"{obj.id_cliente.nombres} {obj.id_cliente.apellidos}-{obj.id_tipo_equipo.descripcion} {obj.marca} {obj.modelo}"
+
 #Mantenimiento solicitud
 class CargaSolicitudForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
