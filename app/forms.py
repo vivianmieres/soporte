@@ -259,12 +259,16 @@ class CargaTipoEquipoForm(forms.ModelForm):
         descrip = self.cleaned_data.get("descripcion")
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Descripcion no puede quedar vacio")
+        
 #Mantenimiento equipo 
 class CargaEquipoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        id_cliente = forms.ModelChoiceField(queryset= Cliente.objects.all())
         id_tipo_equipo = forms.ModelChoiceField(queryset= Tipo_equipo.objects.all())
+
+        self.fields["id_tipo_equipo"].widget.attrs.update({
+            'class':'form-control'
+        })
         
         self.fields["descripcion"].widget.attrs.update({
             'class':'form-control'
@@ -281,6 +285,11 @@ class CargaEquipoForm(forms.ModelForm):
     class Meta:
         model= Equipo
         fields= ["id_equipo","id_cliente","id_tipo_equipo","descripcion","marca","modelo","serie"]
+        
+        widgets ={
+       'id_cliente': ClienteWidget(attrs={'class': 'form-control select2-custom'})
+        }  
+
         labels = {
             'id_cliente'    : 'Cliente',
             'id_tipo_equipo': 'Tipo de equipo'
