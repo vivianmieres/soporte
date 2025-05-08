@@ -454,8 +454,9 @@ def equipo_consulta(request):
       busqueda = request.GET.get("buscar")
       print(busqueda)
       if busqueda:      
-         equipo = (models.Equipo.objects.filter(marca__icontains = busqueda) or
-                   models.Equipo.objects.filter(modelo__icontains = busqueda))
+         equipo = models.Equipo.objects.filter(Q(id_tipo_equipo__descripcion__icontains=busqueda)|
+                                               Q(marca__icontains=busqueda) | 
+                                               Q(modelo__icontains=busqueda))
       print(equipo)
    elif request.method=="POST":
       equipo_seleccionado= request.POST.get("equipo_seleccionado",False)
