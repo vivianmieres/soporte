@@ -88,7 +88,17 @@ class ModifPasswordForm(PasswordChangeForm):
     success_url = reverse_lazy('Acceso')
     template_name = 'usuarioPass.html'   """      
 
+#Widget de un cliente
+class ClienteWidget(ModelSelect2Widget):
+    model = Cliente
+    search_fields = [
+        "nombres__icontains",
+        "apellidos__icontains",
+    ]
 
+    def label_from_instance(self, obj):
+        return f"{obj.apellidos}, {obj.nombres}"
+		
 #Mantenimiento cliente
 class CargaClienteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -157,15 +167,17 @@ class CargaTelefonoForm(forms.ModelForm):
     class Meta:
         model= Telefono
         fields= ["id_telefono","id_cliente","id_prestadora","prefijo","numero","principal","activo"]
+        
+        widgets ={
+       'id_cliente': ClienteWidget(attrs={'class': 'form-control select2-custom'}), 
+       'principal': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
+       'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        } 
+
         labels = {
             'id_cliente'    : 'Cliente',
             'id_prestadora' : 'Prestadora'
         }    
-
-    widgets ={
-       'principal': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
-       'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
-    }  
 
     def validacion(self):
         Cliente = self.cleaned_data.get("id_cliente")
@@ -367,8 +379,8 @@ class CargaSolicitudForm(forms.ModelForm):
         if estado == None:
             raise forms.ValidationError("El campo Estado no puede quedar vacio") 
         
-        descripicion = self.cleaned_data.get("descripcion")
-        if estado == None:
+        descripcion = self.cleaned_data.get("descripcion")
+        if descripcion == None:
             raise forms.ValidationError("El campo Descripcion no puede quedar vacio") 
 			
     def clean(self):
