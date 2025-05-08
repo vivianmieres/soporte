@@ -152,7 +152,7 @@ class Cliente(models.Model):
 class Prestadora(models.Model):
     id_prestadora = models.AutoField(primary_key=True)
     empresa = models.CharField(max_length=100, unique= True)
-    activo = models.BooleanField()
+    activo = models.BooleanField(default= True)
 
     def __str__(self) -> str:
          return str(self.empresa)
@@ -170,7 +170,7 @@ class Telefono(models.Model):
     prefijo = models.CharField(max_length=4)
     numero = models.IntegerField()
     principal = models.BooleanField()
-    activo = models.BooleanField()
+    activo = models.BooleanField(default= True)
 
     def __str__(self) -> str:
         return '('+  str(self.prefijo) +') ' +  str(self.numero)
@@ -183,7 +183,7 @@ class Telefono(models.Model):
 class Tipo_equipo(models.Model):
     id_tipo_equipo = models.AutoField(primary_key=True)
     descripcion = models.CharField(max_length=100)
-    activo = models.BooleanField()
+    activo = models.BooleanField(default= True)
 
     def __str__(self) -> str:
          return str(self.descripcion)
@@ -214,7 +214,7 @@ class Estado(models.Model):
     id_estado = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=150)
-    activo = models.BooleanField() 
+    activo = models.BooleanField(default= True) 
 
     def __str__(self) -> str:
          return str(self.nombre)
@@ -244,7 +244,7 @@ class Solicitud(models.Model):
 class Tipo_respuesto_acc(models.Model):
     id_tipo_repuesto_acc = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    activo = models.BooleanField()
+    activo = models.BooleanField(default= True)
 
     def __str__(self) -> str:
          return str(self.nombre)
@@ -258,7 +258,7 @@ class Repuesto_accesorio(models.Model):
     id_repuesto_acc = models.AutoField(primary_key=True)
     id_tipo_repuesto_acc = models.ForeignKey(Tipo_respuesto_acc, models.DO_NOTHING, db_column='id_tipo_repuesto_acc', null=True)
     descripcion = models.CharField(max_length= 100)
-    precio = models.IntegerField(max_length= 50)
+    precio = models.IntegerField()
    
     
     def __str__(self) -> str:
