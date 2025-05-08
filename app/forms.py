@@ -194,7 +194,23 @@ class CargaTelefonoForm(forms.ModelForm):
          
         numero = self.cleaned_data.get("numero")
         if numero == "" or numero == None:
-            raise forms.ValidationError("El campo Numero no puede quedar vacio")     
+            raise forms.ValidationError("El campo Numero no puede quedar vacio")   
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cliente = cleaned_data.get("id_cliente")
+        principal = cleaned_data.get("principal")
+
+        if principal and cliente:
+            # Filtrar otros teléfonos principales para el mismo cliente
+            qs = Telefono.objects.filter(id_cliente=cliente, principal=True)
+
+            # Si estamos editando un teléfono, excluir el mismo
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                raise forms.ValidationError("Ya existe un teléfono principal para este cliente.")
         
 #Mantenimiento prestadora        
 class CargaPrestadoraForm(forms.ModelForm):
