@@ -31,6 +31,7 @@
                     <th scope="col"></th>
                     <th scope="col">Telefono</th>
                     <th scope="col">Cliente</th>
+                    <th scope="col">Principal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,6 +45,13 @@
                     </td>
                     <td>
                         {{obj.id_cliente.nombres}} {{obj.id_cliente.apellidos}} 
+                    </td>
+                    <td>
+                        {% if obj.principal %}
+                            Si
+                        {% else %}
+                            No
+                        {% endif %}
                     </td>
                     </tr>                
                     {% empty %}
