@@ -268,3 +268,26 @@ class Repuesto_accesorio(models.Model):
     class Meta:
         managed = False
         db_table = 'repuesto_accesorio'
+
+class Cargo(models.Model):
+    id_cargo = models.AutoField(primary_key=True)
+    cargo = models.CharField(max_length=100)
+    activo = models.BooleanField(default= True)
+
+    def __str__(self) -> str:
+         return str(self.cargo)
+    
+
+    class Meta:
+        managed = False
+        db_table = 'cargo'
+
+class Usuario_cargo(models.Model):
+    id_usuario_cargo = models.AutoField(primary_key=True)
+    id = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id') 
+    id_cargo = models.ForeignKey(Cargo, models.DO_NOTHING, db_column='id_cargo')
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        managed = False
+        db_table = 'usuario_cargo'

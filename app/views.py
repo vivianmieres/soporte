@@ -203,6 +203,149 @@ def usuario_mante_pass_login(request):
 
    return render(request,"baseMante.html",context)
 
+#Cargo
+#Consulta Cargo
+def cargo_consulta(request):
+   cargo = []
+   cargo = models.Cargo.objects.all().order_by('id_cargo')
+   print(cargo)
+   if request.method=="GET":
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+      if busqueda:      
+         cargo = (models.Cargo.objects.filter(cargo__icontains = busqueda))
+      print(cargo)
+   elif request.method=="POST":
+      cargo_seleccionado= request.POST.get("cargo_seleccionado",False)
+      print(cargo_seleccionado)
+      if cargo_seleccionado != False:
+         pk_cargo = models.Cargo.objects.get(id_cargo = cargo_seleccionado)
+         print(pk_cargo.id_cargo)
+         return redirect('Cargo_mante_pk',pk=pk_cargo.id_cargo)
+      else: 
+         messages.error(request,"No se selecciono ningun cargo")
+
+   context = {
+      'titulo'      : "Consulta de Cargo",
+      'cargo'     : cargo,
+   } 
+   return render(request,"cargoConsulta.html",context)
+
+#Mantenimiento cargo
+def cargo_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Cargo_consulta')
+
+      form = CargaCargoForm(request.POST or None)  
+      if form.is_valid():    
+         aux1 = form.data.get("cargo")
+         print(aux1)
+         form.save()
+         return redirect('Cargo_consulta')
+      else:
+         print(form.errors)
+   else:
+      form = CargaCargoForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de Cargo",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Modificacion cargo
+def cargo_mante_pk(request,pk): 
+   cargo = models.Cargo.objects.get(id_cargo = pk)
+   form = CargaCargoForm(request.POST or None, instance = cargo) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Cargo_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Cargo_consulta')
+      else:
+         print(form.errors)
+        
+   context = {
+      'titulo': "Mantenimiento de Cargo",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+
+#Asignar cargo
+#Consulta asignar cargo
+def asignar_cargo_consulta(request):
+   usuario_cargo = []
+   usuario_cargo = models.Usuario_cargo.objects.all().order_by('id_usuario_cargo')
+   print(usuario_cargo)
+   if request.method=="GET":
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+      if busqueda:      
+         usuario_cargo = (models.Usuario_cargo.objects.filter(id__username__icontains = busqueda))
+      print(usuario_cargo)
+   elif request.method=="POST":
+      usuario_cargo_seleccionado= request.POST.get("usuario_cargo_seleccionado",False)
+      print(usuario_cargo_seleccionado)
+      if usuario_cargo_seleccionado != False:
+         pk_usuario_cargo = models.Usuario_cargo.objects.get(id_usuario_cargo = usuario_cargo_seleccionado)
+         print(pk_usuario_cargo.id_usuario_cargo)
+         return redirect('Asignar_cargo_mante_pk',pk=pk_usuario_cargo.id_usuario_cargo)
+      else: 
+         messages.error(request,"No se asignó ningún cargo al usuario")
+
+   context = {
+      'titulo'      : "Consulta de Asignación de Cargo",
+      'usuario_cargo'     : usuario_cargo,
+   } 
+   return render(request,"asignarCargoConsulta.html",context)
+
+#Mantenimiento asignar cargo
+def asignar_cargo_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Asignar_cargo_consulta')
+
+      form = CargaAsignarCargoForm(request.POST or None)  
+      if form.is_valid():    
+         #aux1 = form.data.get("cargo")
+         #print(aux1)
+         form.save()
+         return redirect('Asignar_cargo_consulta')
+      else:
+         print(form.errors)
+   else:
+      form = CargaAsignarCargoForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de asignación de Cargo a usuario",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Modificacion asignar cargo
+def asignar_cargo_mante_pk(request,pk): 
+   usuarioCargo = models.Usuario_cargo.objects.get(id_usuario_cargo = pk)
+   form = CargaAsignarCargoForm(request.POST or None, instance = usuarioCargo) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Asignar_cargo_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Asignar_cargo_consulta')
+      else:
+         print(form.errors)
+        
+   context = {
+      'titulo': "Mantenimiento de Asignación de cargo",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
 #MODULO CLIENTE
 #Consulta
 def cliente_consulta(request):

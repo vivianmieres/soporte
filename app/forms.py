@@ -1,4 +1,4 @@
-from .models import Tipo_equipo, Cliente, Equipo, Estado, Solicitud,Telefono, Prestadora
+from .models import Tipo_equipo, Cliente, Equipo, Estado, Solicitud,Telefono, Prestadora, Cargo, Usuario_cargo
 from django import forms
 from django.views.generic.edit import FormView
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, ReadOnlyPasswordHashField
@@ -446,4 +446,55 @@ class CargaTipoRepuestoAccForm(forms.ModelForm):
         descrip = self.cleaned_data.get("nombre")
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Nombre no puede quedar vacio")  
+        
+#Mantenimiento cargo        
+class CargaCargoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["cargo"].widget.attrs.update({
+            'class':'form-control'
+        })
+            
+    class Meta:
+        model= Cargo
+        fields= ["cargo","activo"]
+        error_messages = {
+            "cargo": { "unique": "Este cargo ya se cargo anteriormente."}
+        }        
+
+    widgets ={
+             'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        }    
+
+    def validacion(self):
+        cargo = self.cleaned_data.get("cargo")
+        if cargo == "" or cargo == None:
+            raise forms.ValidationError("El campo Cargo no puede quedar vacio")  
+        
+class CargaAsignarCargoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        id = forms.ModelChoiceField(queryset= User.objects.all())
+        id_cargo = forms.ModelChoiceField(queryset= Cargo.objects.all())
+
+        self.fields["id"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["id_cargo"].widget.attrs.update({
+            'class':'form-control'
+        })
+            
+    class Meta:
+        model= Usuario_cargo
+        fields= ["id_usuario_cargo","id","id_cargo","activo"]
+        labels = {
+            'id': 'Usuario',
+            'id_cargo': 'Cargo'
+        }  
+        widgets ={
+             'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
+        }  
+
         
