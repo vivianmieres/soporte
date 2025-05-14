@@ -1,0 +1,28 @@
+{%extends "baseMante.html" %}
+<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#nuevoClienteModal">
+    + Agregar Cliente
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-labelledby="nuevoClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="nuevoClienteModalLabel">Nuevo Cliente</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            {{ cliente_form.as_p }}
+          </div>
+          <div class="modal-footer">
+            <button type="submit" name="GuardarCliente" class="btn btn-primary">Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  
+

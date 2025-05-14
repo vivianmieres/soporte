@@ -449,8 +449,6 @@ def telefono_consulta(request):
         #if request.GET.nombre:
             #busca por nombre, apellido
       if busqueda:      
-         # telefonos = (models.Telefono.objects.filter(prefijo__icontains = busqueda) or
-         #             models.Telefono.objects.filter(numero__icontains = busqueda))
          telefonos = models.Telefono.objects.filter(Q(id_cliente__nombres__icontains=busqueda) |
                                                     Q(id_cliente__apellidos__icontains=busqueda) |
                                                     Q(prefijo__icontains=busqueda) |
@@ -783,26 +781,29 @@ def solicitud_mante(request):
       if 'Cancelar' in request.POST:
          return redirect('Solicitud_consulta')
 
-      form = CargaSolicitudForm(request.POST or None)  
-      if form.is_valid():    
-         aux1 = form.data.get("descripcion")
-         print(aux1)
-         # form_data = form.cleaned_data
-         # print(form_data)
-         form.save()
-         return redirect('Solicitud_consulta')
+      form = CargaSolicitudForm(request.POST or None)
+      cliente_form = CargaClienteForm(request.POST)  
+      if 'GuardarCliente' in request.POST and cliente_form.is_valid():
+         cliente_form.save()
+         messages.success(request, "Cliente agregado correctamente.")
+         return redirect('Solicitud_mante') 
+      elif 'Guardar' in request.POST and form.is_valid():
+            aux1 = form.data.get("descripcion")
+            print(aux1)
+            form.save()
+            return redirect('Solicitud_consulta')
       else:
-         print(form.errors)
-         #form= CargaSolicitudForm()     
-         #messages.error("No se guardaron los datos")    
+         print(form.errors, cliente_form.errors)    
    else:
       form = CargaSolicitudForm(request.POST or None) 
+      cliente_form = CargaClienteForm(request.POST or None)
 
    context = {
       'titulo': "Mantenimiento de Solicitud",
-      'form'  : form
+      'form'  : form,
+      'cliente_form' : cliente_form
    } 
-   return render(request,"baseMante.html",context)
+   return render(request,"solicitudMante.html",context)
 
 #Modificacion
 def solicitud_mante_pk(request,pk): 
@@ -912,19 +913,19 @@ def respuesto_acc(request):
 #Consulta
 def tipo_repuesto_acc_consulta(request):
    tipo_repuesto_acc = []
-   tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.all()
+   tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.all()
    print(tipo_repuesto_acc)
    if request.method=="GET":
       busqueda = request.GET.get("buscar")
       print(busqueda)
       if busqueda:      
-         tipo_repuesto_acc = (models.Tipo_respuesto_acc.objects.filter(nombre__icontains = busqueda))
+         tipo_repuesto_acc = (models.Tipo_repuesto_acc.objects.filter(nombre__icontains = busqueda))
       print(tipo_repuesto_acc)
    elif request.method=="POST":
       tipo_repuesto_acc_seleccionado= request.POST.get("tipo_repuesto_acc_seleccionado",False)
       print(tipo_repuesto_acc_seleccionado)
       if tipo_repuesto_acc_seleccionado != False:
-         pk_tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.get(nombre = tipo_repuesto_acc_seleccionado)
+         pk_tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.get(id_tipo_repuesto_acc = tipo_repuesto_acc_seleccionado)
          print(pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
          return redirect('Tipo_repuesto_acc_mante_pk',pk=pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
       else: 
