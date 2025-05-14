@@ -240,7 +240,7 @@ class Tipo_repuesto_acc(models.Model):
 
 class Repuesto_accesorio(models.Model):
     id_repuesto_acc = models.AutoField(primary_key=True)
-    id_tipo_repuesto_acc = models.ForeignKey(Tipo_respuesto_acc, models.DO_NOTHING, db_column='id_tipo_repuesto_acc', null=True)
+    id_tipo_repuesto_acc = models.ForeignKey(Tipo_repuesto_acc, models.DO_NOTHING, db_column='id_tipo_repuesto_acc', null=True)
     descripcion = models.CharField(max_length= 100)
     precio = models.IntegerField()
    

@@ -6,7 +6,7 @@
 
 {%block busqueda %}
 <div class="d-flex gap-2 justify-content-center py-1">
-    <h4 class="mb-3">Búsqueda por Prestadora</h4>
+    <h4 class="mb-3">Búsqueda por Operadora</h4>
 </div> 
 
 <div class="px-1 py-1 my-1 text-center">
@@ -37,7 +37,7 @@
                     {%for obj in prestadora%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj}}" name="prestadora_seleccionado">
+                        <input type="radio" value="{{obj.id_prestadora}}" name="prestadora_seleccionado">
                     </td> 
                     <td>
                         {{obj.id_prestadora}} 
@@ -65,3 +65,4 @@
 </div>   
 {% include "botonAtras.html" %} 
 {%endblock%}
+

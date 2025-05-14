@@ -156,7 +156,7 @@ class CargaClienteForm(forms.ModelForm):
 class CargaTelefonoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        id_cliente = forms.ModelChoiceField(queryset= Cliente.objects.all())
+        
         id_prestadora = forms.ModelChoiceField(queryset= Prestadora.objects.all())
         
         self.fields["prefijo"].widget.attrs.update({
@@ -178,7 +178,7 @@ class CargaTelefonoForm(forms.ModelForm):
 
         labels = {
             'id_cliente'    : 'Cliente',
-            'id_prestadora' : 'Prestadora'
+            'id_prestadora' : 'Operadora'
         }    
 
     def validacion(self):
@@ -188,7 +188,7 @@ class CargaTelefonoForm(forms.ModelForm):
 
         Prestadora = self.cleaned_data.get("id_prestadora")
         if Prestadora == None:
-            raise forms.ValidationError("El campo Prestadora no puede quedar vacio")   
+            raise forms.ValidationError("El campo Operadora no puede quedar vacio")   
     
         prefijo = self.cleaned_data.get("prefijo")
         if prefijo == "" or prefijo == None:
@@ -402,9 +402,6 @@ class CargaSolicitudForm(forms.ModelForm):
             'class':'form-control'
         })
 
-        self.fields["id_usuario_cargo"].widget.attrs.update({
-            'class':'form-control'
-        })
     
     class Meta:
         model= Solicitud
@@ -414,7 +411,7 @@ class CargaSolicitudForm(forms.ModelForm):
         } 
         labels = {
             'id_equipo': 'Equipo de un Cliente',
-            'id_estado': 'Estado',
+            'id_estado': 'Tipo de estado',
             'id_usuario_cargo': 'Técnico'
         }    
 

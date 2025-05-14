@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 #from .usuarioForm import UsuarioFormulario
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
-from .forms import CargaTelefonoForm, CargaPrestadoraForm
+from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm
 from . import models
 from django.contrib import messages
@@ -527,17 +527,18 @@ def prestadora_consulta(request):
       prestadora_seleccionado= request.POST.get("prestadora_seleccionado",False)
       print(prestadora_seleccionado)
       if prestadora_seleccionado != False:
-         pk_prestadora = models.Prestadora.objects.get(empresa = prestadora_seleccionado)
+         pk_prestadora = models.Prestadora.objects.get(id_prestadora = prestadora_seleccionado)
          print(pk_prestadora.id_prestadora)
          return redirect('Prestadora_mante_pk',pk=pk_prestadora.id_prestadora)
       else: 
-         messages.error(request,"No se selecciono ninguna prestadora")
+         messages.error(request,"No se selecciono ninguna operadora")
 
    context = {
-      'titulo'      : "Consulta de Prestadora",
+      'titulo'      : "Consulta de Operadora",
       'prestadora'     : prestadora,
    } 
    return render(request,"prestadoraConsulta.html",context)
+
 
 #Mantenimiento prestadora
 def prestadora_mante(request): 
@@ -557,7 +558,7 @@ def prestadora_mante(request):
       form = CargaPrestadoraForm(request.POST or None) 
 
    context = {
-      'titulo': "Mantenimiento de Prestadora",
+      'titulo': "Mantenimiento de Operadora",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
@@ -577,7 +578,7 @@ def prestadora_mante_pk(request,pk):
          print(form.errors)
         
    context = {
-      'titulo': "Mantenimiento de Prestadora",
+      'titulo': "Mantenimiento de Operadora",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
@@ -828,7 +829,7 @@ def solicitud_mante_pk(request,pk):
    return render(request,"baseMante.html",context)
 
 #Estado
-#Consulta
+#Consulta de estado
 def estado_consulta(request):
    estado = []
    estado = models.Estado.objects.all()
@@ -847,10 +848,10 @@ def estado_consulta(request):
          print(pk_estado.id_estado)
          return redirect('Estado_mante_pk',pk=pk_estado.id_estado)
       else: 
-         messages.error(request,"No se selecciono ninguna Solicitud")
+         messages.error(request,"No se selecciono tipo de estado de una solicitud")
 
    context = {
-      'titulo'      : "Consulta de Estado",
+      'titulo'      : "Consulta de Tipo de estado",
       'estado'     : estado,
    } 
    return render(request,"estadoConsulta.html",context)
@@ -877,7 +878,7 @@ def estado_mante(request):
       form = CargaEstadoForm(request.POST or None) 
 
    context = {
-      'titulo': "Mantenimiento de Estado de Solicitud",
+      'titulo': "Mantenimiento de Tipo de estado de Solicitud",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
@@ -899,7 +900,7 @@ def estado_mante_pk(request,pk):
          #messages.error("No se guardaron los datos")   
 
    context = {
-      'titulo': "Mantenimiento de Estado de Solicitud",
+      'titulo': "Mantenimiento de Tipo de estado de Solicitud",
       'form'  : form
    } 
 
@@ -929,10 +930,10 @@ def tipo_repuesto_acc_consulta(request):
          print(pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
          return redirect('Tipo_repuesto_acc_mante_pk',pk=pk_tipo_repuesto_acc.id_tipo_repuesto_acc)
       else: 
-         messages.error(request,"No se selecciono ningun tipo de respuesto/accesorio")
+         messages.error(request,"No se selecciono ningun tipo de repuesto/accesorio")
 
    context = {
-      'titulo'                : "Consulta de Tipo de Respuesto/Accesorio",
+      'titulo'                : "Consulta de Tipo de Repuesto/Accesorio",
       'tipo_repuesto_acc'     : tipo_repuesto_acc,
    } 
    return render(request,"tipoRepuestoAccConsulta.html",context)
@@ -966,7 +967,7 @@ def tipo_repuesto_acc_mante(request):
 
 #Modificacion
 def tipo_repuesto_acc_mante_pk(request,pk): 
-   tipo_repuesto_acc = models.Tipo_respuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
+   tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
    form = CargaTipoRepuestoAccForm(request.POST or None, instance = tipo_repuesto_acc) 
    if request.method=="POST": 
       if 'Cancelar' in request.POST:

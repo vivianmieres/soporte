@@ -38,10 +38,10 @@
                     {%for obj in tipo_repuesto_acc%}
                     <tr>
                     <td>
-                        <input type="radio" value="{{obj}}" name="tipo_repuesto_acc_seleccionado">
+                        <input type="radio" value="{{obj.id_tipo_repuesto_acc}}" name="tipo_repuesto_acc_seleccionado">
                     </td> 
                     <td>
-                        {{obj.id_tipo_respuesto_acc}} 
+                        {{obj.id_tipo_repuesto_acc}} 
                     </td>
                     <td>
                         {{obj.nombre}} 
