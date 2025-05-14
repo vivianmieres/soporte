@@ -34,14 +34,6 @@ urlpatterns = [
     path('password_consulta/', views.usuario_consulta_pass, name= 'Usuario_consulta_pass'),
     path('password_mante/<str:pk>', views.usuario_mante_pass, name= 'Usuario_mante_pass'),
     path('password_mante_login/', views.usuario_mante_pass_login, name= 'Usuario_mante_pass_login'),
-    #modulo usuario - cargo
-    path('cargo_mante/', views.cargo_mante, name= 'Cargo_mante'),
-    path('cargo_mante_pk/<str:pk>', views.cargo_mante_pk, name= 'Cargo_mante_pk'),
-    path('cargo_consulta/', views.cargo_consulta, name= 'Cargo_consulta'),
-    #modulo usuario - asignacion de cargo
-    path('asignar_cargo_mante/', views.asignar_cargo_mante, name= 'Asignar_cargo_mante'),
-    path('asignar_cargo_mante_pk/<str:pk>', views.asignar_cargo_mante_pk, name= 'Asignar_cargo_mante_pk'),
-    path('asignar_cargo_consulta/', views.asignar_cargo_consulta, name= 'Asignar_cargo_consulta'),
     #modulo cliente
     path('cliente_mante/', views.cliente_mante, name= 'Cliente_mante'),
     path('cliente_mante_pk/<str:pk>', views.cliente_mante_pk, name= 'Cliente_mante_pk'),

@@ -7,7 +7,6 @@ from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 from django_select2.forms import ModelSelect2Widget
 import datetime
-from django.db.models import Q
 
 #Mantenimiento usuario
 class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
@@ -390,18 +389,6 @@ class CargaSolicitudForm(forms.ModelForm):
             'class':'form-control'
         })
     
-        # Filtrar solo los usuarios con cargo 'Técnico' y que estén activos
-        cargo_tecnico = Cargo.objects.filter(cargo__iexact="Técnico").first()
-   
-        if cargo_tecnico:
-            self.fields["id_usuario_cargo"].queryset = Usuario_cargo.objects.filter(
-            id_cargo=cargo_tecnico.id_cargo, activo=True).select_related('id')  # optimiza las consultas al traer datos del usuario
-
-            # Mostrar nombre de usuario en el desplegable
-            self.fields["id_usuario_cargo"].label_from_instance = lambda obj: f"{obj.id.username} ({obj.id.first_name} {obj.id.last_name})"
-        else:
-            self.fields["id_usuario_cargo"].queryset = Usuario_cargo.objects.none()
-      
     class Meta:
         model= Solicitud
         fields= ["id_equipo","id_estado","descripcion","fecha_ingreso","fecha_cierre"]
