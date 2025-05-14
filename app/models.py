@@ -225,22 +225,6 @@ class Estado(models.Model):
         db_table = 'estado'
 
 
-class Solicitud(models.Model):
-    id_solicitud = models.AutoField(primary_key=True)
-    id_equipo = models.ForeignKey(Equipo, models.DO_NOTHING, db_column='id_equipo') 
-    id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='id_estado') 
-    descripcion = models.CharField(max_length=150)
-    fecha_ingreso = models.DateField()
-    fecha_cierre = models.DateField(null= True, blank=True)
-
-    def __str__(self) -> str:
-         return str(self.id_solicitud)
-    
-
-    class Meta:
-        managed = True
-        db_table = 'solicitud'
-
 class Tipo_respuesto_acc(models.Model):
     id_tipo_repuesto_acc = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
@@ -291,3 +275,20 @@ class Usuario_cargo(models.Model):
     class Meta:
         managed = False
         db_table = 'usuario_cargo'
+
+class Solicitud(models.Model):
+    id_solicitud = models.AutoField(primary_key=True)
+    id_equipo = models.ForeignKey(Equipo, models.DO_NOTHING, db_column='id_equipo') 
+    id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='id_estado') 
+    descripcion = models.CharField(max_length=150)
+    fecha_ingreso = models.DateField()
+    fecha_cierre = models.DateField(null= True, blank=True)
+    id_usuario_cargo = models.ForeignKey(Usuario_cargo, models.DO_NOTHING, db_column='id_usuario_cargo', null= True)
+
+    def __str__(self) -> str:
+         return str(self.id_solicitud)
+    
+
+    class Meta:
+        managed = True
+        db_table = 'solicitud'
