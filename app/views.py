@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 #from .usuarioForm import UsuarioFormulario
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
-from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm
-from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm
+from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
+from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -776,7 +776,7 @@ def solicitud_consulta(request):
    } 
    return render(request,"solicitudConsulta.html",context)
 
-#Mantenimiento
+#Mantenimiento de solicitud
 def solicitud_mante(request): 
    if request.method=="POST":
       if 'Cancelar' in request.POST:
@@ -806,7 +806,7 @@ def solicitud_mante(request):
    } 
    return render(request,"solicitudMante.html",context)
 
-#Modificacion
+#Modificacion de solicitud
 def solicitud_mante_pk(request,pk): 
    solicitud = models.Solicitud.objects.get(id_solicitud = pk)
    form = CargaSolicitudForm(request.POST or None, instance = solicitud) 
@@ -828,6 +828,87 @@ def solicitud_mante_pk(request,pk):
    } 
    return render(request,"baseMante.html",context)
 
+
+#Asignacion de repuesto/accesorio en una solicitud
+#Consulta de asignacion de repuesto/acc
+def solicitud_repuesto_acc_consulta(request):
+   solicitud_repuesto_acc = []
+   solicitud_repuesto_acc = models.Solicitud_repuesto_acc.objects.select_related(
+        "id_solicitud__id_equipo__id_cliente",
+        "id_repuesto_acc__id_tipo_repuesto_acc"
+    ).all()
+   print(solicitud_repuesto_acc)
+   if request.method=="GET":
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+      if busqueda:      
+         solicitud_repuesto_acc = solicitud_repuesto_acc.filter(
+                Q(id_solicitud__id_equipo__id_cliente__nombres__icontains=busqueda) |
+                Q(id_solicitud__id_equipo__id_cliente__apellidos__icontains=busqueda) |
+                Q(id_repuesto_acc__marca__icontains=busqueda) |
+                Q(id_repuesto_acc__descripcion__icontains=busqueda) |
+                Q(id_repuesto_acc__id_tipo_repuesto_acc__nombre__icontains=busqueda)
+         )
+      print(solicitud_repuesto_acc)
+   elif request.method=="POST":
+      solicitud_repuesto_acc_seleccionado= request.POST.get("solicitud_repuesto_acc_seleccionado",False)
+      print(solicitud_repuesto_acc_seleccionado)
+      if solicitud_repuesto_acc_seleccionado != False:
+         pk_solicitud_repuesto_acc = models.Solicitud_repuesto_acc.objects.get(id_solicitud_repuesto_acc = solicitud_repuesto_acc_seleccionado)
+         print(pk_solicitud_repuesto_acc.id_solicitud_repuesto_acc)
+         return redirect('Solicitud_repuesto_acc_mante_pk',pk=pk_solicitud_repuesto_acc.id_solicitud_repuesto_acc)
+      else: 
+         messages.error(request,"No se ha asignado ningun repuesto a la Solicitud")
+
+   context = {
+      'titulo'      : "Consulta de asignacion de repuesto/accesorio en una solicitud",
+      'solicitud_repuesto_acc'     : solicitud_repuesto_acc,
+   } 
+   return render(request,"solicitudRepuestoAccConsulta.html",context)
+
+#Mantenimiento de asignacion de repuesto/accesorio en una solicitud
+def solicitud_repuesto_acc_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Solicitud_repuesto_acc_consulta')
+      
+      form = CargaSolicitudRepuestoAccForm(request.POST or None) 
+      if form.is_valid():    
+         aux1 = form.data.get("id_solicitud_repuesto_acc")
+         print(aux1)
+         form.save()
+         return redirect('Solicitud_repuesto_acc_consulta')
+      else:
+         print(form.errors)
+        
+   else:
+      form = CargaSolicitudRepuestoAccForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
+      'form'  : form
+   }    
+   return render(request,"baseMante.html",context)
+
+#Modificacion de asignacion de respuesto/accesorio en una solicitud
+def solicitud_repuesto_acc_mante_pk(request,pk): 
+   solicitud_repuesto_acc = models.Solicitud_repuesto_acc.objects.get(id_solicitud_repuesto_acc = pk)
+   form = CargaSolicitudRepuestoAccForm(request.POST or None, instance = solicitud_repuesto_acc) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Solicitud_repuesto_acc_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Solicitud_repuesto_acc_consulta')
+      else:
+         print(form.errors)
+        
+   context = {
+      'titulo': "Mantenimiento de asignación de repuesto/accesorio en una solicitud",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
 #Estado
 #Consulta de estado
 def estado_consulta(request):
@@ -910,8 +991,81 @@ def estado_mante_pk(request,pk):
 def respuesto_acc(request):
    return render(request,"",{}) 
 
-#tipo_repuesto_acc
-#Consulta
+#Repuesto accesorio
+#Consulta de repuesto accesorio
+def repuesto_acc_consulta(request):
+   repuesto_acc = []
+   repuesto_acc = models.Repuesto_accesorio.objects.all()
+   print(repuesto_acc)
+   if request.method=="GET":
+      busqueda = request.GET.get("buscar")
+      print(busqueda)
+      if busqueda:      
+         repuesto_acc = models.Repuesto_accesorio.objects.filter(Q(id_tipo_repuesto_acc__nombre__icontains = busqueda)|
+                                                                  Q(marca__icontains = busqueda)|
+                                                                  Q(descripcion__icontains = busqueda))
+      print(repuesto_acc)
+   elif request.method=="POST":
+      repuesto_acc_seleccionado= request.POST.get("repuesto_acc_seleccionado",False)
+      print(repuesto_acc_seleccionado)
+      if repuesto_acc_seleccionado != False:
+         pk_repuesto_acc = models.Repuesto_accesorio.objects.get(id_repuesto_acc = repuesto_acc_seleccionado)
+         print(pk_repuesto_acc.id_repuesto_acc)
+         return redirect('Repuesto_acc_mante_pk',pk=pk_repuesto_acc.id_repuesto_acc)
+      else: 
+         messages.error(request,"No se selecciono ningun respuesto/accesorio")
+
+   context = {
+      'titulo'           : "Consulta de Respuesto/Accesorio",
+      'repuesto_acc'     : repuesto_acc,
+   } 
+   return render(request,"repuestoAccConsulta.html",context)
+
+#Mantenimiento repuesto accesorio
+def repuesto_acc_mante(request): 
+   if request.method=="POST":
+      if 'Cancelar' in request.POST:
+         return redirect('Repuesto_acc_consulta')
+      
+      form = CargaRepuestoAccForm(request.POST or None) 
+      if form.is_valid():    
+         aux1 = form.data.get("nombre")
+         print(aux1)
+         form.save()
+         return redirect('Repuesto_acc_consulta')
+      else:
+         print(form.errors) 
+   else:
+      form = CargaRepuestoAccForm(request.POST or None) 
+
+   context = {
+      'titulo': "Mantenimiento de Repuesto y Accesorio",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+#Modificacion repuesto accesorio
+def repuesto_acc_mante_pk(request,pk): 
+   repuesto_acc = models.Repuesto_accesorio.objects.get(id_repuesto_acc = pk)
+   form = CargaRepuestoAccForm(request.POST or None, instance = repuesto_acc) 
+   if request.method=="POST": 
+      if 'Cancelar' in request.POST:
+         return redirect('Repuesto_acc_consulta')
+      
+      if form.is_valid():    
+         form.save()
+         return redirect('Repuesto_acc_consulta')
+      else:
+         print(form.errors)
+   context = {
+      'titulo': "Mantenimiento de Repuesto y Accesorio",
+      'form'  : form
+   } 
+   return render(request,"baseMante.html",context)
+
+
+#tipo repuesto acc
+#Consulta de tipo repuesto acc
 def tipo_repuesto_acc_consulta(request):
    tipo_repuesto_acc = []
    tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.all()
@@ -938,7 +1092,7 @@ def tipo_repuesto_acc_consulta(request):
    } 
    return render(request,"tipoRepuestoAccConsulta.html",context)
 
-#Mantenimiento
+#Mantenimiento de tipo repuesto acc
 def tipo_repuesto_acc_mante(request): 
    if request.method=="POST":
       if 'Cancelar' in request.POST:
@@ -965,7 +1119,7 @@ def tipo_repuesto_acc_mante(request):
    } 
    return render(request,"baseMante.html",context)
 
-#Modificacion
+#Modificacion tipo de repuesto acc
 def tipo_repuesto_acc_mante_pk(request,pk): 
    tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
    form = CargaTipoRepuestoAccForm(request.POST or None, instance = tipo_repuesto_acc) 
@@ -982,7 +1136,7 @@ def tipo_repuesto_acc_mante_pk(request,pk):
          #messages.error("No se guardaron los datos")   
 
    context = {
-      'titulo': "Mantenimiento de Repuesto y Accesorio",
+      'titulo': "Mantenimiento de tipo de Repuesto y Accesorio",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)

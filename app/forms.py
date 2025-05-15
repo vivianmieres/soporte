@@ -1,4 +1,5 @@
 from .models import Tipo_equipo, Cliente, Equipo, Estado, Solicitud,Telefono, Prestadora, Cargo, Usuario_cargo
+from .models import Tipo_repuesto_acc, Repuesto_accesorio, Solicitud_repuesto_acc
 from django import forms
 from django.views.generic.edit import FormView
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, ReadOnlyPasswordHashField
@@ -158,7 +159,9 @@ class CargaTelefonoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         id_prestadora = forms.ModelChoiceField(queryset= Prestadora.objects.all())
-        
+		self.fields["id_prestadora"].widget.attrs.update({
+            'class': 'form-control'
+        })
         self.fields["prefijo"].widget.attrs.update({
             'class':'form-control'
         })
@@ -370,7 +373,7 @@ class CargaSolicitudForm(forms.ModelForm):
         #Fecha de hoy por defecto para fecha de ingreso
         self.fields["fecha_ingreso"].initial = datetime.date.today()    
 
-         # Filtrar solo los usuarios con cargo 'Técnico' y que estén activos
+        # Filtrar solo los usuarios con cargo 'Técnico' y que estén activos
         cargo_tecnico = Cargo.objects.filter(cargo__iexact="Técnico").first()
    
         if cargo_tecnico:
@@ -455,7 +458,7 @@ class CargaTipoRepuestoAccForm(forms.ModelForm):
         })
       
     class Meta:
-        model= Estado
+        model= Tipo_repuesto_acc
         fields= ["nombre","activo"]
  
     widgets ={
@@ -466,7 +469,97 @@ class CargaTipoRepuestoAccForm(forms.ModelForm):
         descrip = self.cleaned_data.get("nombre")
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Nombre no puede quedar vacio")  
+#Mantenimiento repuesto accesorio        
+class CargaRepuestoAccForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+       
+        id_tipo_repuesto_acc = forms.ModelChoiceField(queryset= Tipo_repuesto_acc.objects.all())
+
+        self.fields["id_tipo_repuesto_acc"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["marca"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["descripcion"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["precio"].widget.attrs.update({
+            'class':'form-control'
+        })
+      
+    class Meta:
+        model= Repuesto_accesorio
+        fields= ["id_repuesto_acc","id_tipo_repuesto_acc","marca","descripcion","precio"]
+ 
+        labels = {
+            'id_tipo_repuesto_acc': 'Tipo de repuesto/accesorio'
+        }   
+
+    def validacion(self):
+        descrip = self.cleaned_data.get("nombre")
+        if descrip == "" or descrip == None:
+            raise forms.ValidationError("El campo Nombre no puede quedar vacio")  
+
+#Mantenimiento Asignacion de repuesto a una solicitud                
+class CargaSolicitudRepuestoAccForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        #Mostrar solicitud + cliente + equipo si el presupuesto de la solicitud esta confirmada
+        self.fields["id_solicitud"].queryset = Solicitud.objects.select_related(
+            "id_equipo__id_cliente",
+            "id_equipo__id_tipo_equipo",
+            "id_equipo"
+        ).filter(id_estado__nombre__iexact="Presupuesto confirmado")
+
+        self.fields["id_solicitud"].label_from_instance = lambda obj: (
+            f"#{obj.id_solicitud} - "
+            f"{obj.descripcion} - "
+            f"{obj.id_equipo.id_cliente.nombres} {obj.id_equipo.id_cliente.apellidos} - "
+            f"{obj.id_equipo.id_tipo_equipo.descripcion} "
+            f"{obj.id_equipo.marca} {obj.id_equipo.modelo}"
+        ) 
+
+        # Mostrar tipo de repuesto + marca + descripción
+        self.fields["id_repuesto_acc"].label_from_instance = lambda obj: f"{obj.id_tipo_repuesto_acc.nombre} - {obj.marca or ''} {obj.descripcion}".strip()
+
         
+        #Fecha de hoy por defecto para fecha de asignacion
+        self.fields["fecha_asignacion"].initial = datetime.date.today()    
+
+        #Estilos de boostrap
+        self.fields["id_solicitud"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["id_repuesto_acc"].widget.attrs.update({
+            'class':'form-control'
+        })
+
+        self.fields["fecha_asignacion"].widget.attrs.update({
+            'class':'form-control'
+        })
+      
+    class Meta:
+        model= Solicitud_repuesto_acc
+        fields= ["id_solicitud_repuesto_acc","id_solicitud","id_repuesto_acc","fecha_asignacion"]
+ 
+        labels = {
+            'id_solicitud': 'Solicitud de un cliente',
+            'id_repuesto_acc': 'Repuesto/accesorio'
+        }   
+
+    def validacion(self):
+        fecha = self.cleaned_data.get("fecha_asignacion")
+        if fecha == None:
+            raise forms.ValidationError("La fecha de asignacion no puede quedar vacio")   
+               
+
 #Mantenimiento cargo        
 class CargaCargoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -516,5 +609,4 @@ class CargaAsignarCargoForm(forms.ModelForm):
         widgets ={
              'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
         }  
-
         

@@ -240,7 +240,8 @@ class Tipo_repuesto_acc(models.Model):
 
 class Repuesto_accesorio(models.Model):
     id_repuesto_acc = models.AutoField(primary_key=True)
-    id_tipo_repuesto_acc = models.ForeignKey(Tipo_repuesto_acc, models.DO_NOTHING, db_column='id_tipo_repuesto_acc', null=True)
+    id_tipo_repuesto_acc = models.ForeignKey(Tipo_repuesto_acc, models.DO_NOTHING, db_column='id_tipo_repuesto_acc')
+	marca = models.CharField(max_length= 50, null=True)
     descripcion = models.CharField(max_length= 100)
     precio = models.IntegerField()
    
@@ -294,3 +295,17 @@ class Solicitud(models.Model):
     class Meta:
         managed = True
         db_table = 'solicitud'
+
+class Solicitud_repuesto_acc(models.Model):
+    id_solicitud_repuesto_acc = models.AutoField(primary_key=True)
+    id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
+    id_repuesto_acc = models.ForeignKey(Repuesto_accesorio, models.DO_NOTHING, db_column='id_repuesto_acc') 
+    fecha_asignacion =  models.DateField()
+
+    def __str__(self) -> str:
+         return str(self.id_solicitud_repuesto_acc)
+    
+
+    class Meta:
+        managed = False
+        db_table = 'solicitud_repuesto_acc'

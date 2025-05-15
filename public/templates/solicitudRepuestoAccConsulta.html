@@ -1,0 +1,79 @@
+{%extends "base.html" %}
+
+{%block incluir_navbar%}
+    {% include "navbar.html" %}
+{%endblock%}
+
+{%block busqueda %}
+<div class="d-flex gap-2 justify-content-center py-1">
+    <h4 class="mb-3">Búsqueda por cliente/repuesto/accesorio</h4>
+</div> 
+
+<div class="px-1 py-1 my-1 text-center">
+    {%include "buscador.html"%} 
+</div>
+
+{%endblock%}
+
+{%block grilla%}
+{% load static %}
+<div class="text-start">
+    <div class="container col- col-md-7 border p-3">
+        <form method= "POST" action ="" >{%csrf_token%}
+            {% if messages %}
+                {% for message in messages %}
+                    <span id="errorMessage"> {{message}}</span><br><br>
+                {% endfor %}
+            {% endif %}
+            <table class="table">
+                <thead class="table-primary">
+                    <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Solicitud</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Equipo</th>
+                    <th scope="col">Repuesto/accesorio</th>
+                    <th scope="col">Fecha de asignación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for obj in solicitud_repuesto_acc%}
+                    <tr>
+                    <td>
+                        <input type="radio" value="{{obj.id_solicitud_repuesto_acc}}" name="solicitud_repuesto_acc_seleccionado">
+                    </td> 
+                    <td>
+                        {{obj.id_solicitud}} - {{obj.id_solicitud.descripcion}}
+                    </td>
+                    <td>
+                        {{obj.id_solicitud.id_equipo.id_cliente.nombres}} {{obj.id_solicitud.id_equipo.id_cliente.apellidos}} 
+                    </td>
+                    <td>
+                        {{obj.id_solicitud.id_equipo.descripcion}} {{obj.id_solicitud.id_equipo.marca}} {{obj.id_solicitud.id_equipo.modelo}}
+                    </td>
+                    <td>
+                       {{obj.id_repuesto_acc.id_tipo_repuesto_acc.nombre}} {{obj.id_repuesto_acc.marca}} {{obj.id_repuesto_acc.descripcion}}
+                    </td>
+                    <td>
+                        {{obj.fecha_asignacion}} 
+                    </td>
+                    </tr>                
+                    {% empty %}
+                    <p>No hay registros.</p>
+                    {%endfor%} 
+                </tbody>
+            </table>                                          
+            <input type="submit" class="btn btn-primary" value="Modificar"> 
+        </form>     
+    </div>
+</div>
+
+{%endblock%}
+
+{%block botones%}
+<div class="d-flex gap-2 justify-content-center py-1">
+    <a href="{%url 'Solicitud_repuesto_acc_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
+</div>  
+{% include "botonAtras.html" %}
+{%endblock%}
+

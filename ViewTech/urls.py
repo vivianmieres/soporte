@@ -34,7 +34,7 @@ urlpatterns = [
     path('password_consulta/', views.usuario_consulta_pass, name= 'Usuario_consulta_pass'),
     path('password_mante/<str:pk>', views.usuario_mante_pass, name= 'Usuario_mante_pass'),
     path('password_mante_login/', views.usuario_mante_pass_login, name= 'Usuario_mante_pass_login'),
-	#modulo usuario - cargo
+    #modulo usuario - cargo
     path('cargo_mante/', views.cargo_mante, name= 'Cargo_mante'),
     path('cargo_mante_pk/<str:pk>', views.cargo_mante_pk, name= 'Cargo_mante_pk'),
     path('cargo_consulta/', views.cargo_consulta, name= 'Cargo_consulta'),
@@ -66,19 +66,22 @@ urlpatterns = [
    path('solicitud/',views.solicitud, name='Solicitud'),         
    path('solicitud/solicitud_consulta/', views.solicitud_consulta, name= 'Solicitud_consulta'),
    path('solicitud/solicitud_mante/', views.solicitud_mante, name= 'Solicitud_mante'),
-   path('solicitud/solicitud_mante_pk/<str:pk>', views.solicitud_mante_pk, name= 'Solicitud_mante_pk'),     
+   path('solicitud/solicitud_mante_pk/<str:pk>', views.solicitud_mante_pk, name= 'Solicitud_mante_pk'),   
+   path('solicitud/solicitud_repuesto_acc_consulta/', views.solicitud_repuesto_acc_consulta, name= 'Solicitud_repuesto_acc_consulta'),
+   path('solicitud/solicitud_repuesto_acc_mante/', views.solicitud_repuesto_acc_mante, name= 'Solicitud_repuesto_acc_mante'),
+   path('solicitud/solicitud_repuesto_acc_mante_pk/<str:pk>', views.solicitud_repuesto_acc_mante_pk, name= 'Solicitud_repuesto_acc_mante_pk'),     
    path('solicitud/estado_consulta/', views.estado_consulta, name= 'Estado_consulta'),
    path('solicitud/estado_mante/', views.estado_mante, name= 'Estado_mante'),
    path('solicitud/estado_mante_pk/<str:pk>', views.estado_mante_pk, name= 'Estado_mante_pk'),     
    #modulo repuesto/accesorio
    path('repuesto_acc/',views.respuesto_acc, name='Repuesto_acc'),
-   #path('equipo/repuesto_acc_consulta/', views.equipo_consulta, name= 'Equipo_consulta'),
-   #path('equipo/equipo_mante/', views.equipo_mante, name= 'Equipo_mante'),
-   #path('equipo/equipo_mante_pk/<str:pk>', views.equipo_mante_pk, name= 'Equipo_mante_pk'),
+   path('equipo/repuesto_acc_consulta/', views.repuesto_acc_consulta, name= 'Repuesto_acc_consulta'),
+   path('equipo/repuesto_acc_mante/', views.repuesto_acc_mante, name= 'Repuesto_acc_mante'),
+   path('equipo/repuesto_acc_mante_pk/<str:pk>', views.repuesto_acc_mante_pk, name= 'Repuesto_acc_mante_pk'),
    path('repuesto_acc/tipo_repuesto_acc_consulta/', views.tipo_repuesto_acc_consulta, name= 'Tipo_repuesto_acc_consulta'),
    path('repuesto_acc/tipo_repuesto_acc_mante/', views.tipo_repuesto_acc_mante, name= 'Tipo_repuesto_acc_mante'),
    path('repuesto_acc/tipo_repuesto_acc_mante_pk/<str:pk>', views.tipo_repuesto_acc_mante_pk, name= 'Tipo_repuesto_acc_mante_pk'),
-   path('select2/', include('django_select2.urls'))                                                            
+    path("select2/", include("django_select2.urls")),                                                           
 ]
 
 

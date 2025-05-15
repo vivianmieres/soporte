@@ -9,7 +9,8 @@
             <a class="nav-link dropdown-toggle" href= "#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Solicitud</a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="{%url 'Solicitud_consulta'%}">Solicitud</a></li>
-              <li><a class="dropdown-item" href="{%url 'Estado_consulta'%}">Tipos de estado de Solicitud</a></li>
+              <li><a class="dropdown-item" href="{%url 'Solicitud_repuesto_acc_consulta'%}">Asignar repuesto/accesorio en una Solicitud</a></li>
+              <li><a class="dropdown-item" href="{%url 'Estado_consulta'%}">Tipo de estado de Solicitud</a></li>
             </ul>
           </li>
           <li class="nav-item dropdown">
@@ -30,7 +31,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href= "#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Repuesto y Accesorio</a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% comment %} {%url 'tipo_respuesto_acc_consulta'%} {% endcomment %}">Repuesto y Accesorio</a></li>
+              <li><a class="dropdown-item" href="{%url 'Repuesto_acc_consulta'%}">Repuesto y Accesorio</a></li>
               <li><a class="dropdown-item" href="{%url 'Tipo_repuesto_acc_consulta'%}">Tipo de Repuesto y Accesorio</a></li>
             </ul>
           </li>
