@@ -159,7 +159,7 @@ class CargaTelefonoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         id_prestadora = forms.ModelChoiceField(queryset= Prestadora.objects.all())
-		self.fields["id_prestadora"].widget.attrs.update({
+        self.fields["id_prestadora"].widget.attrs.update({
             'class': 'form-control'
         })
         self.fields["prefijo"].widget.attrs.update({
