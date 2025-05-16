@@ -1,0 +1,68 @@
+{%extends "base.html" %}
+
+{%block incluir_navbar%}
+    {% include "navbar.html" %}
+{%endblock%}
+
+{% block reporte%}
+<div class="container mt-4">
+    <h3>Filtrar Solicitudes</h3>
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            {{ form.desde.label_tag }}
+            {{ form.desde }}
+        </div>
+        <div class="col-md-3">
+            {{ form.hasta.label_tag }}
+            {{ form.hasta }}
+        </div>
+        <div class="col-md-3">
+            {{ form.cliente.label_tag }}
+            {{ form.cliente }}
+        </div>
+        <div class="col-md-3">
+            {{ form.estado.label_tag }}
+            {{ form.estado}}
+        </div>
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <button type="submit" name="generar_pdf" class="btn btn-primary">Generar PDF</button>
+        </div>
+    </form>
+
+    {% if solicitudes %}
+    <div class="mt-4">
+        <h5>Resultados:</h5>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Equipo</th>
+                    <th>Tipo</th>
+                    <th>Tipo de estado</th>
+                    <th>Descripción</th>
+                    <th>Fecha Ingreso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in solicitudes %}
+                <tr>
+                    <td>{{ s.id_solicitud }}</td>
+                    <td>{{ s.id_equipo.id_cliente.nombres }} {{ s.id_equipo.id_cliente.apellidos }}</td>
+                    <td>{{ s.id_equipo.marca }} {{ s.id_equipo.modelo }}</td>
+                    <td>{{ s.id_equipo.id_tipo_equipo.descripcion }}</td>
+                    <td>{{ s.id_estado.nombre }}</td>
+                    <td>{{ s.descripcion }}</td>
+                    <td>{{ s.fecha_ingreso }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="mt-4">No se encontraron resultados.</p>
+    {% endif %}
+
+</div>
+{% endblock%}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid black; padding: 4px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Solicitudes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Equipo</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Descripción</th>
+                <th>Fecha Ingreso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in solicitudes %}
+            <tr>
+                <td>{{ s.id_solicitud }}</td>
+                <td>{{ s.id_equipo.id_cliente.nombres }} {{ s.id_equipo.id_cliente.apellidos }}</td>
+                <td>{{ s.id_equipo.marca }} {{ s.id_equipo.modelo }}</td>
+                <td>{{ s.id_equipo.id_tipo_equipo.descripcion }}</td>
+                <td>{{ s.id_estado.descripcion }}</td>
+                <td>{{ s.descripcion }}</td>
+                <td>{{ s.fecha_ingreso }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

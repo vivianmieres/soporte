@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django_select2.forms import ModelSelect2Widget
 import datetime
 from django.db.models import Q
+from django.forms import DateInput
 
 #Mantenimiento usuario
 class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
@@ -395,12 +396,15 @@ class CargaSolicitudForm(forms.ModelForm):
             'class':'form-control'
         })
         self.fields["fecha_ingreso"].widget.attrs.update({
-            'class':'form-control'
+            'class': 'form-control datepicker',
+            'autocomplete': 'off',
+            'placeholder': 'dd/mm/yyyy'
         })
         self.fields["fecha_cierre"].widget.attrs.update({
-            'class':'form-control'
+            'class': 'form-control datepicker',
+            'autocomplete': 'off',
+            'placeholder': 'dd/mm/yyyy'
         })
-
         self.fields["id_usuario_cargo"].widget.attrs.update({
             'class':'form-control'
         })
@@ -410,7 +414,9 @@ class CargaSolicitudForm(forms.ModelForm):
         model= Solicitud
         fields= ["id_equipo","id_estado","descripcion","fecha_ingreso","fecha_cierre","id_usuario_cargo"]
         widgets = {
-            'id_equipo': EquipoWidget
+            'id_equipo': EquipoWidget,
+            'fecha_ingreso': DateInput(format='%d/%m/%Y'),
+            'fecha_cierre': DateInput(format='%d/%m/%Y'),
         } 
         labels = {
             'id_equipo': 'Equipo de un Cliente',
@@ -609,4 +615,46 @@ class CargaAsignarCargoForm(forms.ModelForm):
         widgets ={
              'activo': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
         }  
+
+class FiltroSolicitudForm(forms.Form):
+    desde = forms.DateField(
+        required=False,
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
+    )
+    hasta = forms.DateField(
+        required=False,
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
+    )
+    cliente = forms.CharField(
+        required=False,
+        label="Cliente (nombre o apellido)",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    estado = forms.ModelChoiceField(
+        queryset=Estado.objects.filter(activo=True),
+        required=False,
+        label="Tipo de estado",
+        empty_label="Todos los estados",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
         

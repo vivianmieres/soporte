@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
 from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
+from .forms import FiltroSolicitudForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -11,6 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 # Create your views here.
 
 def Login(request):
@@ -1141,7 +1145,45 @@ def tipo_repuesto_acc_mante_pk(request,pk):
    } 
    return render(request,"baseMante.html",context)
 
+#REPORTES
+#Reporte de solicitud
+def solicitud_reporte(request):
+   form = FiltroSolicitudForm(request.GET or None)
+   solicitudes = models.Solicitud.objects.select_related(
+        "id_equipo__id_cliente",
+        "id_equipo__id_tipo_equipo",
+        "id_estado"
+   )
+   
+   if form.is_valid():
+      cd = form.cleaned_data
+      if cd['desde']:
+         solicitudes = solicitudes.filter(fecha_ingreso__gte=cd['desde'])
+      if cd['hasta']:
+         solicitudes = solicitudes.filter(fecha_ingreso__lte=cd['hasta'])
+      if cd['cliente']:
+         solicitudes = solicitudes.filter(
+            Q(id_equipo__id_cliente__nombres__icontains=cd['cliente']) |
+            Q(id_equipo__id_cliente__apellidos__icontains=cd['cliente'])
+         )
+      if cd['estado']:
+         solicitudes = solicitudes.filter(id_estado=cd['estado'])
 
+   if 'generar_pdf' in request.GET:
+      template = get_template("solicitudReporte.html")
+      html = template.render({"solicitudes": solicitudes})
+      response = HttpResponse(content_type='application/pdf')
+      response['Content-Disposition'] = 'attachment; filename="reporte_solicitudes.pdf"'
+      pisa.CreatePDF(html, dest=response)
+      return response
+      
+   context = {
+      'titulo': "Reporte de solicitudes en PDF",
+      'form'  : form,
+      'solicitudes': solicitudes
+   } 
+
+   return render(request, "solicitudFiltro.html", context)
 
 
 
