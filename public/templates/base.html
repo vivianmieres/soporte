@@ -145,7 +145,7 @@
     <script src={% static 'js/bootstrap-datepicker.es.min.js' %}></script>
     <script scr={% static 'js/fecha_cierre.js' %}></script>
 
-    {% comment %} <script>
+    <script>
     $(document).ready(function () {
         $('.datepicker').datepicker({
             format: 'dd/mm/yyyy',
@@ -154,7 +154,7 @@
             todayHighlight: true
         });
     });
-    </script> {% endcomment %}
+    </script>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -205,7 +205,8 @@
         {%block botones%}
         {%endblock%}
 
-     
+        {%block reporte%}
+        {%endblock%}
         
     </main>
 
