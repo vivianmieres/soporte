@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
 from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
-from .forms import FiltroSolicitudForm
+from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from datetime import datetime
 # Create your views here.
 
 def Login(request):
@@ -1154,7 +1155,7 @@ def solicitud_reporte(request):
         "id_equipo__id_tipo_equipo",
         "id_estado"
    )
-   
+
    if form.is_valid():
       cd = form.cleaned_data
       if cd['desde']:
@@ -1168,6 +1169,9 @@ def solicitud_reporte(request):
          )
       if cd['estado']:
          solicitudes = solicitudes.filter(id_estado=cd['estado'])
+   
+   # Ordenar por ID
+   solicitudes = solicitudes.order_by("id_solicitud")
 
    if 'generar_pdf' in request.GET:
       template = get_template("solicitudReporte.html")
@@ -1184,6 +1188,40 @@ def solicitud_reporte(request):
    } 
 
    return render(request, "solicitudFiltro.html", context)
+
+#Inventario de repuesto/accesorio
+def repuesto_acc_inventario(request):
+   form = FiltroRepuestoAccForm(request.GET or None)
+   repuestos = models.Repuesto_accesorio.objects.select_related("id_tipo_repuesto_acc")
+
+   if form.is_valid():
+      cd = form.cleaned_data
+      if cd["tipo"]:
+         repuestos = repuestos.filter(id_tipo_repuesto_acc=cd["tipo"])
+      if cd["marca"]:
+         repuestos = repuestos.filter(marca__icontains=cd["marca"])
+
+   # Ordenar por ID
+   repuestos = repuestos.order_by("id_repuesto_acc")
+      
+   if 'generar_pdf' in request.GET:
+      template = get_template("repuestoAccInventario.html")
+      html = template.render({
+        "repuestos": repuestos,
+        "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")  # ejemplo: 14/05/2025 10:45 AM
+      })
+      response = HttpResponse(content_type='application/pdf')
+      response['Content-Disposition'] = 'attachment; filename="inventario_repuestos_acc.pdf"'
+      pisa.CreatePDF(html, dest=response)
+      return response
+      
+   context = {
+      'titulo': "Inventario de Repuestos/Accesorios en PDF",
+      'form'  : form,
+      'repuestos': repuestos
+   } 
+
+   return render(request, "repuestoAccFiltro.html", context)
 
 
 

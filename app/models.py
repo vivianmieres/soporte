@@ -244,6 +244,9 @@ class Repuesto_accesorio(models.Model):
     marca = models.CharField(max_length= 50, null=True)
     descripcion = models.CharField(max_length= 100)
     precio = models.IntegerField()
+    cant = models.IntegerField()
+    stock = models.IntegerField()
+    fecha_registro = models.DateField(auto_now_add=True)
    
     
     def __str__(self) -> str:
@@ -309,3 +312,10 @@ class Solicitud_repuesto_acc(models.Model):
     class Meta:
         managed = False
         db_table = 'solicitud_repuesto_acc'
+
+class Solicitud_estado_historico(models.Model):
+    id_solicitud_estado_historico = models.AutoField(primary_key=True)
+    id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
+    id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='id_estado')
+    desde = models.DateField()
+    hasta = models.DateField()

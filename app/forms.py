@@ -497,10 +497,14 @@ class CargaRepuestoAccForm(forms.ModelForm):
         self.fields["precio"].widget.attrs.update({
             'class':'form-control'
         })
+
+        self.fields["cant"].widget.attrs.update({
+            'class':'form-control'
+        })
       
     class Meta:
         model= Repuesto_accesorio
-        fields= ["id_repuesto_acc","id_tipo_repuesto_acc","marca","descripcion","precio"]
+        fields= ["id_repuesto_acc","id_tipo_repuesto_acc","marca","descripcion","precio","cant"]
  
         labels = {
             'id_tipo_repuesto_acc': 'Tipo de repuesto/accesorio'
@@ -650,11 +654,24 @@ class FiltroSolicitudForm(forms.Form):
         queryset=Estado.objects.filter(activo=True),
         required=False,
         label="Tipo de estado",
-        empty_label="Todos los estados",
+        empty_label="Todos los tipos de estados",
         widget=forms.Select(attrs={'class': 'form-select'})
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
+
+class FiltroRepuestoAccForm(forms.Form):
+    tipo = forms.ModelChoiceField(
+        queryset= Tipo_repuesto_acc.objects.all(),
+        required=False,
+        label="Tipo de Repuesto/Accesorio",
+        empty_label="Todos los tipos de respuestos/accesorios",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    marca = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
         

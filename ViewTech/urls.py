@@ -83,7 +83,8 @@ urlpatterns = [
    path('repuesto_acc/tipo_repuesto_acc_mante_pk/<str:pk>', views.tipo_repuesto_acc_mante_pk, name= 'Tipo_repuesto_acc_mante_pk'),
    path("select2/", include("django_select2.urls")),
    #modulo reportes
-   path("reporte/solicitud_reporte/", views.solicitud_reporte, name="Solicitud_reporte"),                                                           
+   path("reporte/solicitud_reporte/", views.solicitud_reporte, name="Solicitud_reporte"),
+   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),                                                           
 ]
 
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid black; padding: 4px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Inventario de Repuestos/accesorios a la fecha {{ fecha_actual }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nro.</th>
+                <th>Tipo</th>
+                <th>Marca</th>
+                <th>Descripción</th>
+                <th>Fecha ingreso</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in repuestos %}
+            <tr>
+                <td>{{ r.id_repuesto_acc }}</td>
+                <td>{{ r.id_tipo_repuesto_acc.nombre }}</td>
+                <td>{{ r.marca }}</td>
+                <td>{{ r.descripcion }}</td>
+                <td>{{ r.fecha_registro}}</td>
+                <td>{{ r.stock }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>    
+</body>
