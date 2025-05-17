@@ -16,6 +16,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from datetime import datetime
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 def Login(request):
@@ -881,7 +883,22 @@ def solicitud_repuesto_acc_mante(request):
       if form.is_valid():    
          aux1 = form.data.get("id_solicitud_repuesto_acc")
          print(aux1)
-         form.save()
+         with transaction.atomic():  # Para garantizar integridad
+            solicitud_repuesto_acc = form.save(commit=False)
+            repuesto = solicitud_repuesto_acc.id_repuesto_acc
+
+            # Verificamos que haya stock disponible
+            if repuesto.stock > 0:
+               repuesto.stock -= 1
+               repuesto.save()
+               solicitud_repuesto_acc.save()
+            else:
+               form.add_error('id_repuesto_acc', 'No hay stock disponible de este repuesto/accesorio.')  
+               context = {
+                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
+                        'form': form
+                    }
+               return render(request, "baseMante.html", context) 
          return redirect('Solicitud_repuesto_acc_consulta')
       else:
          print(form.errors)
@@ -897,14 +914,42 @@ def solicitud_repuesto_acc_mante(request):
 
 #Modificacion de asignacion de respuesto/accesorio en una solicitud
 def solicitud_repuesto_acc_mante_pk(request,pk): 
-   solicitud_repuesto_acc = models.Solicitud_repuesto_acc.objects.get(id_solicitud_repuesto_acc = pk)
+   solicitud_repuesto_acc = get_object_or_404(models.Solicitud_repuesto_acc, id_solicitud_repuesto_acc=pk)
    form = CargaSolicitudRepuestoAccForm(request.POST or None, instance = solicitud_repuesto_acc) 
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
          return redirect('Solicitud_repuesto_acc_consulta')
       
       if form.is_valid():    
-         form.save()
+         with transaction.atomic():
+            antiguo_repuesto = solicitud_repuesto_acc.id_repuesto_acc
+            nueva_asignacion = form.save(commit=False)
+            nuevo_repuesto = nueva_asignacion.id_repuesto_acc
+
+            # Si cambió el repuesto
+            if antiguo_repuesto != nuevo_repuesto:
+              # Validamos que haya stock en el nuevo repuesto
+               if nuevo_repuesto.stock > 0:
+                  # Restamos del nuevo repuesto
+                  nuevo_repuesto.stock -= 1
+                  nuevo_repuesto.save()
+
+                  # Sumamos al stock del repuesto anterior
+                  antiguo_repuesto.stock += 1
+                  antiguo_repuesto.save()
+
+                  nueva_asignacion.save()
+               else:
+                  form.add_error('id_repuesto_acc', 'No hay stock disponible del nuevo repuesto/accesorio.')
+                  context = {
+                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
+                        'form': form
+                  }
+                  return render(request, "baseMante.html", context) 
+            else:
+               # Si no cambió el repuesto, solo se guarda
+               nueva_asignacion.save()
+
          return redirect('Solicitud_repuesto_acc_consulta')
       else:
          print(form.errors)
@@ -1036,7 +1081,22 @@ def repuesto_acc_mante(request):
       if form.is_valid():    
          aux1 = form.data.get("nombre")
          print(aux1)
-         form.save()
+         with transaction.atomic():  # Para garantizar integridad
+            solicitud_repuesto_acc = form.save(commit=False)
+            repuesto = solicitud_repuesto_acc.id_repuesto_acc
+
+            # Verificamos que haya stock disponible
+            if repuesto.stock > 0:
+               repuesto.stock -= 1
+               repuesto.save()
+               solicitud_repuesto_acc.save()
+            else:
+               form.add_error('id_repuesto_acc', 'No hay stock disponible de este repuesto/accesorio.')  
+               context = {
+                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
+                        'form': form
+                    }
+               return render(request, "baseMante.html", context)
          return redirect('Repuesto_acc_consulta')
       else:
          print(form.errors) 
@@ -1058,7 +1118,35 @@ def repuesto_acc_mante_pk(request,pk):
          return redirect('Repuesto_acc_consulta')
       
       if form.is_valid():    
-         form.save()
+         with transaction.atomic():
+            antiguo_repuesto = solicitud_repuesto_acc.id_repuesto_acc
+            nueva_asignacion = form.save(commit=False)
+            nuevo_repuesto = nueva_asignacion.id_repuesto_acc
+
+            # Si cambió el repuesto
+            if antiguo_repuesto != nuevo_repuesto:
+              # Validamos que haya stock en el nuevo repuesto
+               if nuevo_repuesto.stock > 0:
+                  # Restamos del nuevo repuesto
+                  nuevo_repuesto.stock -= 1
+                  nuevo_repuesto.save()
+
+                  # Sumamos al stock del repuesto anterior
+                  antiguo_repuesto.stock += 1
+                  antiguo_repuesto.save()
+
+                  nueva_asignacion.save()
+               else:
+                  form.add_error('id_repuesto_acc', 'No hay stock disponible del nuevo repuesto/accesorio.')
+                  context = {
+                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
+                        'form': form
+                  }
+                  return render(request, "baseMante.html", context) 
+            else:
+               # Si no cambió el repuesto, solo se guarda
+               nueva_asignacion.save()
+
          return redirect('Repuesto_acc_consulta')
       else:
          print(form.errors)
@@ -1128,6 +1216,10 @@ def tipo_repuesto_acc_mante(request):
 def tipo_repuesto_acc_mante_pk(request,pk): 
    tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
    form = CargaTipoRepuestoAccForm(request.POST or None, instance = tipo_repuesto_acc) 
+
+   # Deshabilitar el campo 'cant' para que no se pueda modificar
+   form.fields['cant'].disabled = True
+
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
          return redirect('Tipo_repuesto_acc_consulta')

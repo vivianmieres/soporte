@@ -513,7 +513,18 @@ class CargaRepuestoAccForm(forms.ModelForm):
     def validacion(self):
         descrip = self.cleaned_data.get("nombre")
         if descrip == "" or descrip == None:
-            raise forms.ValidationError("El campo Nombre no puede quedar vacio")  
+            raise forms.ValidationError("El campo Nombre no puede quedar vacio") 
+        
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if self.instance.pk:
+            # No modificar 'cant' si es una instancia ya existente
+            instance.cant = self.instance.cant
+
+        if commit:
+            instance.save()
+        return instance 
 
 #Mantenimiento Asignacion de repuesto a una solicitud                
 class CargaSolicitudRepuestoAccForm(forms.ModelForm):
@@ -535,8 +546,13 @@ class CargaSolicitudRepuestoAccForm(forms.ModelForm):
             f"{obj.id_equipo.marca} {obj.id_equipo.modelo}"
         ) 
 
-        # Mostrar tipo de repuesto + marca + descripción
-        self.fields["id_repuesto_acc"].label_from_instance = lambda obj: f"{obj.id_tipo_repuesto_acc.nombre} - {obj.marca or ''} {obj.descripcion}".strip()
+        # Solo mostrar repuestos con stock > 0
+        self.fields["id_repuesto_acc"].queryset = Repuesto_accesorio.objects.filter(stock__gt=0)
+
+        # Mostrar tipo de repuesto + marca + descripción + stock disponible
+        self.fields["id_repuesto_acc"].label_from_instance = lambda obj: (
+        f"{obj.id_tipo_repuesto_acc.nombre} - {obj.marca or ''} {obj.descripcion} "
+        f"(Stock: {obj.stock})").strip()
 
         
         #Fecha de hoy por defecto para fecha de asignacion
@@ -567,7 +583,13 @@ class CargaSolicitudRepuestoAccForm(forms.ModelForm):
     def validacion(self):
         fecha = self.cleaned_data.get("fecha_asignacion")
         if fecha == None:
-            raise forms.ValidationError("La fecha de asignacion no puede quedar vacio")   
+            raise forms.ValidationError("La fecha de asignacion no puede quedar vacio")  
+
+    def clean_id_repuesto_acc(self):
+        repuesto = self.cleaned_data.get("id_repuesto_acc")
+        if repuesto and repuesto.stock <= 0:
+            raise forms.ValidationError("Este repuesto/accesorio no tiene stock disponible.")
+        return repuesto
                
 
 #Mantenimiento cargo        
