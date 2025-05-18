@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid black; padding: 4px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Repuestos/Accesorios Usados por Equipo</h2>
+    <p>Generado: {{ fecha_actual }}</p>
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th>Solicitud</th>
+                <th>Cliente</th>
+                <th>Descripción</th>
+                <th>Equipo</th>
+                <th>Tipo de Repuesto</th>
+                <th>Repuesto</th>
+                <th>Fecha de Asignación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usados %}
+            <tr>
+                <td>{{ u.id_solicitud.id_solicitud }}</td>
+                <td>{{ u.id_solicitud.id_equipo.id_cliente.nombres }} {{ u.id_solicitud.id_equipo.id_cliente.apellidos }}</td>
+                <td>{{ u.id_solicitud.descripcion }}</td>
+                <td>{{ u.id_solicitud.id_equipo.marca }} {{ u.id_solicitud.id_equipo.modelo }}</td>
+                <td>{{ u.id_repuesto_acc.id_tipo_repuesto_acc.nombre }}</td>
+                <td>{{ u.id_repuesto_acc.marca }} {{ u.id_repuesto_acc.descripcion }}</td>
+                <td>{{ u.fecha_asignacion|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -3,7 +3,6 @@
 
 {% block reporte %}
 <div class="container mt-4">
-    <h3>Reporte de Tiempo de Resolución por Estado</h3>
     <form method="get" class="row g-3">
         <div class="col-md-3">
             {{ form.cliente.label_tag }}
@@ -27,31 +26,38 @@
         </div>
     </form>
 
-    <table class="table table-bordered mt-4">
-        <thead class="table-light">
-            <tr>
-                <th>Solicitud</th>
-                <th>Cliente</th>
-                <th>Estado</th>
-                <th>Técnico</th>
-                <th>Desde</th>
-                <th>Hasta</th>
-                <th>Horas</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for h in historicos %}
-            <tr>
-                <td>{{ h.id_solicitud.id_solicitud }}</td>
-                <td>{{ h.id_solicitud.id_equipo.id_cliente.nombres}} {{ h.id_solicitud.id_equipo.id_cliente.apellidos}}</td>
-                <td>{{ h.id_estado.nombre }}</td>
-                <td>{{ h.id_solicitud.id_usuario_cargo.id.username }}</td>
-                <td>{{ h.desde|date:"d/m/Y H:i" }}</td>
-                <td>{{ h.hasta|date:"d/m/Y H:i" }}</td>
-                <td>{{ h.tiempo_resolucion }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if historicos %}
+    <div class="mt-4">
+        <h5>Resultados:</h5>
+        <table class="table table-bordered mt-4">
+            <thead class="table-light">
+                <tr>
+                    <th>Solicitud</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>Técnico</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Horas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in historicos %}
+                <tr>
+                    <td>{{ h.id_solicitud.id_solicitud }}</td>
+                    <td>{{ h.id_solicitud.id_equipo.id_cliente.nombres}} {{ h.id_solicitud.id_equipo.id_cliente.apellidos}}</td>
+                    <td>{{ h.id_estado.nombre }}</td>
+                    <td>{{ h.id_solicitud.id_usuario_cargo.id.username }}</td>
+                    <td>{{ h.desde|date:"d/m/Y H:i" }}</td>
+                    <td>{{ h.hasta|date:"d/m/Y H:i" }}</td>
+                    <td>{{ h.tiempo_resolucion }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="mt-4">No se encontraron resultados.</p>
+    {% endif %}
 </div>
 {% endblock %}

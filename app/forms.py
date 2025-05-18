@@ -740,3 +740,35 @@ class FiltroEstadoTiempoResolucionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
+
+class FiltroRepuestoAccUsadosForm(forms.Form):
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        required=False,
+        label="Cliente",
+        empty_label="Todos los clientes",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    repuesto = forms.ModelChoiceField(
+        queryset=Repuesto_accesorio.objects.all(),
+        required=False,
+        label="Repuesto/accesorio",
+        empty_label="Todos los repuestos/accesorios",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    fecha_inicio = forms.DateField(
+        required=False,
+        label="Desde",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    fecha_fin = forms.DateField(
+        required=False,
+        label="Hasta",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['repuesto'].label_from_instance = lambda obj: (
+            f"{obj.id_tipo_repuesto_acc.nombre} - {obj.marca} - {obj.descripcion}"
+        )

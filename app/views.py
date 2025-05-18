@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
 from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
-from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm
+from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm, FiltroRepuestoAccUsadosForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -1260,14 +1260,17 @@ def solicitud_reporte(request):
 
    if 'generar_pdf' in request.GET:
       template = get_template("solicitudReporte.html")
-      html = template.render({"solicitudes": solicitudes})
+      html = template.render({
+         "solicitudes": solicitudes,
+         "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")  # ejemplo: 14/05/2025 10:45 AM
+      })
       response = HttpResponse(content_type='application/pdf')
       response['Content-Disposition'] = 'attachment; filename="reporte_solicitudes.pdf"'
       pisa.CreatePDF(html, dest=response)
       return response
       
    context = {
-      'titulo': "Reporte de solicitudes en PDF",
+      'titulo': "Reporte de solicitudes",
       'form'  : form,
       'solicitudes': solicitudes
    } 
@@ -1350,3 +1353,41 @@ def estado_tiempo_resolucion_reporte(request):
    }
 
    return render(request, "estadoTiempoResolucionFiltro.html", context)
+
+def repuestos_acc_usados_reporte(request):
+    form = FiltroRepuestoAccUsadosForm(request.GET or None)
+    usados = models.Solicitud_repuesto_acc.objects.select_related(
+        "id_solicitud", "id_repuesto_acc",
+        "id_solicitud__id_equipo__id_cliente"
+    )
+
+    if form.is_valid():
+        cd = form.cleaned_data
+        if cd["cliente"]:
+            usados = usados.filter(id_solicitud__id_equipo__id_cliente=cd["cliente"])
+        if cd["repuesto"]:
+            usados = usados.filter(id_repuesto_acc=cd["repuesto"])
+        if cd["fecha_inicio"]:
+            usados = usados.filter(fecha_asignacion__gte=cd["fecha_inicio"])
+        if cd["fecha_fin"]:
+            usados = usados.filter(fecha_asignacion__lte=cd["fecha_fin"])
+
+    usados = usados.order_by("fecha_asignacion")
+
+    if 'generar_pdf' in request.GET:
+        template = get_template("repuestosAccUsadosReporte.html")
+        html = template.render({
+            "usados": usados,
+            "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
+        })
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="repuestos_acc_usados.pdf"'
+        pisa.CreatePDF(html, dest=response)
+        return response
+
+    context = {
+        "form": form,
+        "usados": usados,
+        "titulo": "Reporte de Repuestos/Accesorios Usados por Equipo"
+    }
+    return render(request, "repuestosAccUsadosFiltro.html", context)
