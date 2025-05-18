@@ -1042,7 +1042,7 @@ def estado_mante(request):
       form = CargaEstadoForm(request.POST or None) 
 
    context = {
-      'titulo': "Mantenimiento de Tipo de estado de Solicitud",
+      'titulo': "Mantenimiento de Tipo de estado de una solicitud",
       'form'  : form
    } 
    return render(request,"baseMante.html",context)
@@ -1381,13 +1381,13 @@ def repuestos_acc_usados_reporte(request):
             "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
         })
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="repuestos_acc_usados.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="historico_equipo.pdf"'
         pisa.CreatePDF(html, dest=response)
         return response
 
     context = {
         "form": form,
         "usados": usados,
-        "titulo": "Reporte de Repuestos/Accesorios Usados por Equipo"
+        "titulo": "Reporte de histórico por Equipo"
     }
     return render(request, "repuestosAccUsadosFiltro.html", context)
