@@ -32,7 +32,7 @@ class CargaUsuarioForm(UserCreationForm,forms.ModelForm):
         model= User
         fields= ["username","first_name","last_name", "email","is_staff","is_active","is_superuser","password1","password2"]
 
-    widgets ={
+        widgets ={
             'is_superuser': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
             'is_staff': forms.CheckboxInput(attrs={'class':'checkboxInvoice'}),
             'is_active': forms.CheckboxInput(attrs={'class':'checkboxInvoice'})
@@ -441,14 +441,27 @@ class CargaSolicitudForm(forms.ModelForm):
         cleaned_data = super().clean()
         estado = cleaned_data.get("id_estado")
         fecha_cierre = cleaned_data.get("fecha_cierre")
+        tecnico = cleaned_data.get("id_usuario_cargo")
 
         # Verificamos si el estado se llama 'Cerrado'
         if estado and estado.nombre.lower() != 'cerrado' and fecha_cierre:
             raise forms.ValidationError("La fecha de cierre solo se puede completar si el estado es 'Cerrado'.")
         
-         # Si está en 'Cerrado' pero no tiene fecha de cierre, podría obligarlo
+        # Si está en 'Cerrado' pero no tiene fecha de cierre, podría obligarlo
         if estado and estado.nombre.lower() == 'cerrado' and not fecha_cierre:
             raise forms.ValidationError("Debe completar la fecha de cierre para un estado 'Cerrado'.")
+        
+        # Si estado es Cerrado y no hay fecha de cierre, asignar fecha actual
+        if estado and estado.nombre.lower() == 'cerrado':
+            if not fecha_cierre:
+                cleaned_data["fecha_cierre"] = datetime.date.today()
+        elif fecha_cierre:
+            # Si estado no es Cerrado pero hay fecha de cierre, lanzar error
+            raise forms.ValidationError("La fecha de cierre solo se puede completar si el estado es 'Cerrado'.")
+        
+        # Validar que técnico sea obligatorio si el estado es 'Diagnóstico y presupuesto' (id_estado == 2)
+        if estado and estado.id_estado == 2 and not tecnico:
+            self.add_error('id_usuario_cargo', "Debe asignar un técnico cuando el estado es 'Diagnóstico y presupuesto'.")
 
         return cleaned_data
 
@@ -536,7 +549,8 @@ class CargaSolicitudRepuestoAccForm(forms.ModelForm):
             "id_equipo__id_cliente",
             "id_equipo__id_tipo_equipo",
             "id_equipo"
-        ).filter(id_estado__nombre__iexact="Presupuesto confirmado")
+        ).filter(Q(id_estado__nombre__iexact="Presupuesto confirmado")|
+                 Q(id_estado__nombre__iexact="Reparación en curso"))
 
         self.fields["id_solicitud"].label_from_instance = lambda obj: (
             f"#{obj.id_solicitud} - "
@@ -676,7 +690,7 @@ class FiltroSolicitudForm(forms.Form):
         queryset=Estado.objects.filter(activo=True),
         required=False,
         label="Tipo de estado",
-        empty_label="Todos los tipos de estados",
+        empty_label="Todos los tipos de estado",
         widget=forms.Select(attrs={'class': 'form-select'})
     )
 
@@ -696,4 +710,33 @@ class FiltroRepuestoAccForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-        
+
+class FiltroEstadoTiempoResolucionForm(forms.Form):
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        required=False,
+        label="Cliente",
+        empty_label="Todos los clientes",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    estado = forms.ModelChoiceField(
+        queryset=Estado.objects.filter(activo=True),  # Solo los estados activos
+        required=False,
+        label="Tipo de estado",
+        empty_label="Todos los tipos de estado",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    fecha_inicio = forms.DateField(
+        required=False,
+        label="Desde",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    fecha_fin = forms.DateField(
+        required=False,
+        label="Hasta",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"

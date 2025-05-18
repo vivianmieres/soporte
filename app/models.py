@@ -317,5 +317,9 @@ class Solicitud_estado_historico(models.Model):
     id_solicitud_estado_historico = models.AutoField(primary_key=True)
     id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
     id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='id_estado')
-    desde = models.DateField()
-    hasta = models.DateField()
+    desde = models.DateTimeField()
+    hasta = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'solicitud_estado_historico'

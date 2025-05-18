@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPasswordForm, CargaTipoEquipoForm
 from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
-from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm
+from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Prefetch
@@ -18,6 +18,8 @@ from xhtml2pdf import pisa
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.timezone import now
 # Create your views here.
 
 def Login(request):
@@ -756,7 +758,7 @@ def solicitud(request):
    return render(request,"",{}) 
 
 #Solicitud
-#Consulta
+#Consulta de solicitud
 def solicitud_consulta(request):
    solicitud = []
    solicitud = models.Solicitud.objects.all()
@@ -798,7 +800,15 @@ def solicitud_mante(request):
       elif 'Guardar' in request.POST and form.is_valid():
             aux1 = form.data.get("descripcion")
             print(aux1)
-            form.save()
+            solicitud = form.save()  # Guardamos la solicitud nueva
+            #Crear registro en la tabla de histórico de estado
+            models.Solicitud_estado_historico.objects.create(
+               id_solicitud=solicitud,
+               id_estado=solicitud.id_estado,
+               desde=timezone.now(),  # Fecha y hora actual
+               hasta=None  # lo dejás como None hasta que cambie de estado
+            )
+
             return redirect('Solicitud_consulta')
       else:
          print(form.errors, cliente_form.errors)    
@@ -816,13 +826,36 @@ def solicitud_mante(request):
 #Modificacion de solicitud
 def solicitud_mante_pk(request,pk): 
    solicitud = models.Solicitud.objects.get(id_solicitud = pk)
+   estado_anterior = solicitud.id_estado  # Guardamos el estado actual antes de editar
+
    form = CargaSolicitudForm(request.POST or None, instance = solicitud) 
+
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
          return redirect('Solicitud_consulta')
       
       if form.is_valid():    
-         form.save()
+         with transaction.atomic():
+            solicitud_actualizada = form.save(commit=False)
+            nuevo_estado = solicitud_actualizada.id_estado
+
+            # Si el estado cambió, actualizamos el historial
+            if nuevo_estado != estado_anterior:
+               # Cerrar el historial anterior (si existe)
+               models.Solicitud_estado_historico.objects.filter(
+                  id_solicitud=solicitud,
+                  hasta__isnull=True
+               ).update(hasta=timezone.now())
+
+               # Crear nuevo historial de estado
+               models.Solicitud_estado_historico.objects.create(
+                  id_solicitud=solicitud,
+                  id_estado=nuevo_estado,
+                  desde=timezone.now(),
+                  hasta=None
+               )
+
+            solicitud_actualizada.save()
          return redirect('Solicitud_consulta')
       else:
          print(form.errors)
@@ -987,7 +1020,7 @@ def estado_consulta(request):
    } 
    return render(request,"estadoConsulta.html",context)
 
-#Mantenimiento
+#Mantenimiento de estado
 def estado_mante(request): 
    if request.method=="POST":
       if 'Cancelar' in request.POST:
@@ -1014,7 +1047,7 @@ def estado_mante(request):
    } 
    return render(request,"baseMante.html",context)
 
-#Modificacion
+#Modificacion de estado
 def estado_mante_pk(request,pk): 
    estado = models.Estado.objects.get(id_estado = pk)
    form = CargaEstadoForm(request.POST or None, instance = estado) 
@@ -1063,10 +1096,10 @@ def repuesto_acc_consulta(request):
          print(pk_repuesto_acc.id_repuesto_acc)
          return redirect('Repuesto_acc_mante_pk',pk=pk_repuesto_acc.id_repuesto_acc)
       else: 
-         messages.error(request,"No se selecciono ningun respuesto/accesorio")
+         messages.error(request,"No se selecciono ningun repuesto/accesorio")
 
    context = {
-      'titulo'           : "Consulta de Respuesto/Accesorio",
+      'titulo'           : "Consulta de Repuesto/Accesorio",
       'repuesto_acc'     : repuesto_acc,
    } 
    return render(request,"repuestoAccConsulta.html",context)
@@ -1081,22 +1114,9 @@ def repuesto_acc_mante(request):
       if form.is_valid():    
          aux1 = form.data.get("nombre")
          print(aux1)
-         with transaction.atomic():  # Para garantizar integridad
-            solicitud_repuesto_acc = form.save(commit=False)
-            repuesto = solicitud_repuesto_acc.id_repuesto_acc
-
-            # Verificamos que haya stock disponible
-            if repuesto.stock > 0:
-               repuesto.stock -= 1
-               repuesto.save()
-               solicitud_repuesto_acc.save()
-            else:
-               form.add_error('id_repuesto_acc', 'No hay stock disponible de este repuesto/accesorio.')  
-               context = {
-                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
-                        'form': form
-                    }
-               return render(request, "baseMante.html", context)
+         repuesto = form.save(commit=False)
+         repuesto.stock = repuesto.cant  # Asignar stock igual a cant
+         repuesto.save()
          return redirect('Repuesto_acc_consulta')
       else:
          print(form.errors) 
@@ -1113,40 +1133,17 @@ def repuesto_acc_mante(request):
 def repuesto_acc_mante_pk(request,pk): 
    repuesto_acc = models.Repuesto_accesorio.objects.get(id_repuesto_acc = pk)
    form = CargaRepuestoAccForm(request.POST or None, instance = repuesto_acc) 
+
+   # Deshabilitar el campo 'cant' para que no se pueda modificar
+   form.fields['cant'].disabled = True
+
+
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
          return redirect('Repuesto_acc_consulta')
       
       if form.is_valid():    
-         with transaction.atomic():
-            antiguo_repuesto = solicitud_repuesto_acc.id_repuesto_acc
-            nueva_asignacion = form.save(commit=False)
-            nuevo_repuesto = nueva_asignacion.id_repuesto_acc
-
-            # Si cambió el repuesto
-            if antiguo_repuesto != nuevo_repuesto:
-              # Validamos que haya stock en el nuevo repuesto
-               if nuevo_repuesto.stock > 0:
-                  # Restamos del nuevo repuesto
-                  nuevo_repuesto.stock -= 1
-                  nuevo_repuesto.save()
-
-                  # Sumamos al stock del repuesto anterior
-                  antiguo_repuesto.stock += 1
-                  antiguo_repuesto.save()
-
-                  nueva_asignacion.save()
-               else:
-                  form.add_error('id_repuesto_acc', 'No hay stock disponible del nuevo repuesto/accesorio.')
-                  context = {
-                        'titulo': "Mantenimiento de asignación de repuesto/accesorio en una Solicitud",
-                        'form': form
-                  }
-                  return render(request, "baseMante.html", context) 
-            else:
-               # Si no cambió el repuesto, solo se guarda
-               nueva_asignacion.save()
-
+         form.save()
          return redirect('Repuesto_acc_consulta')
       else:
          print(form.errors)
@@ -1216,10 +1213,6 @@ def tipo_repuesto_acc_mante(request):
 def tipo_repuesto_acc_mante_pk(request,pk): 
    tipo_repuesto_acc = models.Tipo_repuesto_acc.objects.get(id_tipo_repuesto_acc = pk)
    form = CargaTipoRepuestoAccForm(request.POST or None, instance = tipo_repuesto_acc) 
-
-   # Deshabilitar el campo 'cant' para que no se pueda modificar
-   form.fields['cant'].disabled = True
-
    if request.method=="POST": 
       if 'Cancelar' in request.POST:
          return redirect('Tipo_repuesto_acc_consulta')
@@ -1315,41 +1308,45 @@ def repuesto_acc_inventario(request):
 
    return render(request, "repuestoAccFiltro.html", context)
 
+def estado_tiempo_resolucion_reporte(request):
+   form = FiltroEstadoTiempoResolucionForm(request.GET or None)
+   historicos = models.Solicitud_estado_historico.objects.select_related(
+      "id_solicitud", "id_estado", "id_solicitud__id_usuario_cargo", "id_solicitud__id_equipo__id_cliente"
+   )
 
-
-""" def usuario_mante_pass(request,pk):
-   usuario= models.AuthUser.objects.get(id = pk)
-   form = ModifPasswordForm(request.POST or None) 
-   if request.method=="POST":
-      if form.is_valid:    
-         form.save()
-         return redirect('Acceso')
-      else:
-         form= ModifPasswordForm()     
-         messages.error("No se guardaron los datos")   
-         
-   context = {
-      'titulo': "Modificacion de Contraseña",
-      'form'  : form
-   } 
-   return render(request,"usuarioPass.html",context)    """
-
-""" def usuario_mante_pass(ModifPasswordForm):
-   form_class = ModifPasswordForm
-   success_url = reverse_lazy('home')
-   template_name = 'usuarioPass.html' """
-
-
-""" @login_required
-def usuario_mante_pass(request):
-   form = ModifPasswordForm(user=request.user, data=request.POST or None)
    if form.is_valid():
-     form.save()
-     update_session_auth_hash(request, form.user)
-     return redirect('Acceso')
-   
+      cd = form.cleaned_data
+      if cd["cliente"]:
+         historicos = historicos.filter(id_solicitud__id_equipo__id_cliente=cd["cliente"])
+      if cd["estado"]:
+        historicos = historicos.filter(id_estado=cd["estado"])
+      if cd["fecha_inicio"]:
+         historicos = historicos.filter(id_solicitud__fecha_ingreso__gte=cd["fecha_inicio"])
+      if cd["fecha_fin"]:
+         historicos = historicos.filter(id_solicitud__fecha_ingreso__lte=cd["fecha_fin"])
+
+   # Cálculo del tiempo de resolución por estado (en horas)
+   for h in historicos:
+      if h.desde and h.hasta:
+         h.tiempo_resolucion = round((h.hasta - h.desde).total_seconds() / 3600, 2)
+      else:
+         h.tiempo_resolucion = 0  
+
+   if 'generar_pdf' in request.GET:
+      template = get_template("tiempoResolucionReporte.html")
+      html = template.render({
+         "historicos": historicos,
+         "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
+      })
+      response = HttpResponse(content_type='application/pdf')
+      response['Content-Disposition'] = 'attachment; filename="estado_tiempo_resolucion.pdf"'
+      pisa.CreatePDF(html, dest=response)
+      return response
+
    context = {
-      'titulo': "Modificacion de Contraseña",
-      'form'  : form
-   } 
-   return render(request, 'usuarioPass.html', context) """
+      'titulo': "Reporte de Tiempo de Resolución por tipo de estado de una solicitud",
+      'form': form,
+      'historicos': historicos
+   }
+
+   return render(request, "estadoTiempoResolucionFiltro.html", context)

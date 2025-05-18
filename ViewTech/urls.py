@@ -84,7 +84,8 @@ urlpatterns = [
    path("select2/", include("django_select2.urls")),
    #modulo reportes
    path("reporte/solicitud_reporte/", views.solicitud_reporte, name="Solicitud_reporte"),
-   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),                                                           
+   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),
+   path("reporte/estado_tiempo_res_reporte/", views.estado_tiempo_resolucion_reporte, name="Estado_tiempo_res_reporte"),                                                       
 ]
 
 

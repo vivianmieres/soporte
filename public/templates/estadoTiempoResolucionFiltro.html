@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block incluir_navbar %}{% include "navbar.html" %}{% endblock %}
+
+{% block reporte %}
+<div class="container mt-4">
+    <h3>Reporte de Tiempo de Resolución por Estado</h3>
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            {{ form.cliente.label_tag }}
+            {{ form.cliente }}
+        </div>
+        <div class="col-md-3">
+            {{ form.estado.label_tag }}
+            {{ form.estado }}
+        </div>
+        <div class="col-md-3">
+            {{ form.fecha_inicio.label_tag }}
+            {{ form.fecha_inicio }}
+        </div>
+        <div class="col-md-3">
+            {{ form.fecha_fin.label_tag }}
+            {{ form.fecha_fin }}
+        </div>
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <button type="submit" name="generar_pdf" class="btn btn-primary">Generar PDF</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th>Solicitud</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Técnico</th>
+                <th>Desde</th>
+                <th>Hasta</th>
+                <th>Horas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in historicos %}
+            <tr>
+                <td>{{ h.id_solicitud.id_solicitud }}</td>
+                <td>{{ h.id_solicitud.id_equipo.id_cliente.nombres}} {{ h.id_solicitud.id_equipo.id_cliente.apellidos}}</td>
+                <td>{{ h.id_estado.nombre }}</td>
+                <td>{{ h.id_solicitud.id_usuario_cargo.id.username }}</td>
+                <td>{{ h.desde|date:"d/m/Y H:i" }}</td>
+                <td>{{ h.hasta|date:"d/m/Y H:i" }}</td>
+                <td>{{ h.tiempo_resolucion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
