@@ -712,12 +712,10 @@ class FiltroRepuestoAccForm(forms.Form):
     )
 
 class FiltroEstadoTiempoResolucionForm(forms.Form):
-    cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.all(),
+    cliente = forms.CharField(
         required=False,
-        label="Cliente",
-        empty_label="Todos los clientes",
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label="Cliente (nombre o apellido)",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     estado = forms.ModelChoiceField(
         queryset=Estado.objects.filter(activo=True),  # Solo los estados activos

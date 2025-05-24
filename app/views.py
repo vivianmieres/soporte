@@ -1314,13 +1314,19 @@ def repuesto_acc_inventario(request):
 def estado_tiempo_resolucion_reporte(request):
    form = FiltroEstadoTiempoResolucionForm(request.GET or None)
    historicos = models.Solicitud_estado_historico.objects.select_related(
-      "id_solicitud", "id_estado", "id_solicitud__id_usuario_cargo", "id_solicitud__id_equipo__id_cliente"
+      "id_solicitud", 
+      "id_estado", 
+      "id_solicitud__id_usuario_cargo", 
+      "id_solicitud__id_equipo__id_cliente"
    )
 
    if form.is_valid():
       cd = form.cleaned_data
-      if cd["cliente"]:
-         historicos = historicos.filter(id_solicitud__id_equipo__id_cliente=cd["cliente"])
+      if cd['cliente']:
+         historicos = historicos.filter(
+            Q(id_solicitud__id_equipo__id_cliente__nombres__icontains=cd['cliente']) |
+            Q(id_solicitud__id_equipo__id_cliente__apellidos__icontains=cd['cliente'])
+         )
       if cd["estado"]:
         historicos = historicos.filter(id_estado=cd["estado"])
       if cd["fecha_inicio"]:
@@ -1336,7 +1342,7 @@ def estado_tiempo_resolucion_reporte(request):
          h.tiempo_resolucion = 0  
 
    if 'generar_pdf' in request.GET:
-      template = get_template("tiempoResolucionReporte.html")
+      template = get_template("estadoTiempoResolucionReporte.html")
       html = template.render({
          "historicos": historicos,
          "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
@@ -1355,39 +1361,42 @@ def estado_tiempo_resolucion_reporte(request):
    return render(request, "estadoTiempoResolucionFiltro.html", context)
 
 def repuestos_acc_usados_reporte(request):
-    form = FiltroRepuestoAccUsadosForm(request.GET or None)
-    usados = models.Solicitud_repuesto_acc.objects.select_related(
-        "id_solicitud", "id_repuesto_acc",
-        "id_solicitud__id_equipo__id_cliente"
-    )
+   form = FiltroRepuestoAccUsadosForm(request.GET or None)
+   usados = models.Solicitud_repuesto_acc.objects.select_related(
+      "id_solicitud", "id_repuesto_acc",
+      "id_solicitud__id_equipo__id_cliente"
+   )
 
-    if form.is_valid():
-        cd = form.cleaned_data
-        if cd["cliente"]:
-            usados = usados.filter(id_solicitud__id_equipo__id_cliente=cd["cliente"])
-        if cd["repuesto"]:
-            usados = usados.filter(id_repuesto_acc=cd["repuesto"])
-        if cd["fecha_inicio"]:
-            usados = usados.filter(fecha_asignacion__gte=cd["fecha_inicio"])
-        if cd["fecha_fin"]:
-            usados = usados.filter(fecha_asignacion__lte=cd["fecha_fin"])
+   if form.is_valid():
+      cd = form.cleaned_data
+      if cd['cliente']:
+         usados = usados.filter(
+            Q(id_solicitud__id_equipo__id_cliente__nombres__icontains=cd['cliente']) |
+            Q(id_solicitud__id_equipo__id_cliente__apellidos__icontains=cd['cliente'])
+         )
+      if cd["repuesto"]:
+         usados = usados.filter(id_repuesto_acc=cd["repuesto"])
+      if cd["fecha_inicio"]:
+         usados = usados.filter(fecha_asignacion__gte=cd["fecha_inicio"])
+      if cd["fecha_fin"]:
+         usados = usados.filter(fecha_asignacion__lte=cd["fecha_fin"])
 
-    usados = usados.order_by("fecha_asignacion")
+   usados = usados.order_by("fecha_asignacion")
 
-    if 'generar_pdf' in request.GET:
-        template = get_template("repuestosAccUsadosReporte.html")
-        html = template.render({
-            "usados": usados,
-            "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
-        })
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="historico_equipo.pdf"'
-        pisa.CreatePDF(html, dest=response)
-        return response
+   if 'generar_pdf' in request.GET:
+      template = get_template("repuestosAccUsadosReporte.html")
+      html = template.render({
+         "usados": usados,
+         "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p")
+      })
+      response = HttpResponse(content_type='application/pdf')
+      response['Content-Disposition'] = 'attachment; filename="historico_equipo.pdf"'
+      pisa.CreatePDF(html, dest=response)
+      return response
 
-    context = {
+   context = {
         "form": form,
         "usados": usados,
         "titulo": "Reporte de histórico por Equipo"
-    }
-    return render(request, "repuestosAccUsadosFiltro.html", context)
+   }
+   return render(request, "repuestosAccUsadosFiltro.html", context)

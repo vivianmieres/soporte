@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { border: 1px solid black; padding: 4px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 4px;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Ajuste de anchos */
+        th:nth-child(1), td:nth-child(1) { width: 10%; }
+        th:nth-child(2), td:nth-child(2) { width: 20%; }
+        th:nth-child(3), td:nth-child(3) { width: 16%; }
+        th:nth-child(4), td:nth-child(4) { width: 12%; }
+        th:nth-child(5), td:nth-child(5) { width: 16%; }
+        th:nth-child(6), td:nth-child(6) { width: 16%; }
+        th:nth-child(7), td:nth-child(7) { width: 10%; }
     </style>
 </head>
 <body>
@@ -14,24 +50,24 @@
     <table>
         <thead>
             <tr>
-                <th>Solicitud</th>
-                <th>Cliente</th>
-                <th>Estado</th>
-                <th>Técnico</th>
-                <th>Desde</th>
-                <th>Hasta</th>
-                <th>Horas</th>
+                <th style="width: 9%;">Solicitud</th>
+                <th style="width: 19%;">Cliente</th>
+                <th style="width: 15%;">Estado</th>
+                <th style="width: 12%;">Técnico</th>
+                <th style="width: 15%;">Desde</th>
+                <th style="width: 15%;">Hasta</th>
+                <th style="width: 9%;">Horas</th>
             </tr>
         </thead>
         <tbody>
             {% for h in historicos %}
             <tr>
                 <td>{{ h.id_solicitud.id_solicitud }}</td>
-                <td>{{ h.id_solicitud.id_equipo.id_cliente.nombres}} {{ h.id_solicitud.id_equipo.id_cliente.apellidos}}</td>
+                <td>{{ h.id_solicitud.id_equipo.id_cliente.nombres }} {{ h.id_solicitud.id_equipo.id_cliente.apellidos }}</td>
                 <td>{{ h.id_estado.nombre }}</td>
                 <td>{{ h.id_solicitud.id_usuario_cargo.id.username }}</td>
                 <td>{{ h.desde|date:"d/m/Y H:i" }}</td>
-                <td>{{ h.hasta|date:"d/m/Y H:i" }}</td>
+                <td>{% if h.hasta %}{{ h.hasta|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td>
                 <td>{{ h.tiempo_resolucion }}</td>
             </tr>
             {% endfor %}
