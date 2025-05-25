@@ -727,12 +727,28 @@ class FiltroEstadoTiempoResolucionForm(forms.Form):
     fecha_inicio = forms.DateField(
         required=False,
         label="Desde",
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
     )
     fecha_fin = forms.DateField(
         required=False,
         label="Hasta",
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
     )
 
     def __init__(self, *args, **kwargs):
@@ -750,10 +766,26 @@ class FiltroRepuestoAccUsadosForm(forms.Form):
     fecha_inicio = forms.DateField(
         required=False,
         label="Desde",
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
     )
     fecha_fin = forms.DateField(
         required=False,
         label="Hasta",
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
     )
