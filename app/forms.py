@@ -789,3 +789,32 @@ class FiltroRepuestoAccUsadosForm(forms.Form):
             }
         )
     )
+
+class FiltroRendimientoTecnicoForm(forms.Form):
+    fecha_inicio = forms.DateField(
+        required=False,
+        label="Desde",
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
+    )
+    fecha_fin = forms.DateField(
+        required=False,
+        label="Hasta",
+        input_formats=['%d/%m/%Y'],
+        widget=forms.DateInput(
+            format='%d/%m/%Y',
+            attrs={
+                'class': 'form-control datepicker',
+                'placeholder': 'dd/mm/yyyy',
+                'autocomplete': 'off'
+            }
+        )
+    )
+

@@ -4,9 +4,10 @@ from .forms import CargaUsuarioForm, CargaClienteForm, ModifUsuarioForm, ModifPa
 from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, CargaAsignarCargoForm, CargaSolicitudRepuestoAccForm
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
 from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm, FiltroRepuestoAccUsadosForm
+from .forms import FiltroRendimientoTecnicoForm
 from . import models
 from django.contrib import messages
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Count
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
@@ -20,6 +21,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now
+from collections import defaultdict
 # Create your views here.
 
 def Login(request):
@@ -1400,3 +1402,96 @@ def repuestos_acc_usados_reporte(request):
         "titulo": "Reporte de histórico por Equipo"
    }
    return render(request, "repuestosAccUsadosFiltro.html", context)
+
+def rendimiento_tecnicos_estadistica(request):
+   form = FiltroRendimientoTecnicoForm(request.GET or None)
+   rendimiento = {}
+   chart_labels = []
+   chart_data = []
+   recibidas_data = []
+   cerradas_data = []
+   pendientes_data = []
+
+   if form.is_valid():
+      cd = form.cleaned_data
+      fecha_inicio = cd["fecha_inicio"]
+      fecha_fin = cd["fecha_fin"]
+
+      historicos = models.Solicitud_estado_historico.objects.select_related(
+         "id_solicitud__id_usuario_cargo__id",
+         "id_estado"
+      ).filter(
+         id_solicitud__id_usuario_cargo__id_cargo__cargo="Técnico"
+      )
+
+      if fecha_inicio:
+         historicos = historicos.filter(desde__gte=fecha_inicio)
+      if fecha_fin:
+         historicos = historicos.filter(desde__lte=fecha_fin)
+
+      # Calcular horas trabajadas
+      horas_por_tecnico = defaultdict(float)
+      for h in historicos:
+         hasta = h.hasta or timezone.now()
+         desde = h.desde
+
+         # Convertir 'desde' y 'hasta' a aware si es naive
+         if timezone.is_naive(desde):
+            desde = timezone.make_aware(desde)
+         if timezone.is_naive(hasta):
+            hasta = timezone.make_aware(hasta)
+
+         duracion = (hasta - desde).total_seconds() / 3600
+         tecnico = h.id_solicitud.id_usuario_cargo.id.username
+         horas_por_tecnico[tecnico] += duracion
+
+      # Solicitudes recibidas/cerradas/pendientes
+      solicitudes = models.Solicitud.objects.select_related("id_usuario_cargo__id", "id_estado")\
+         .filter(id_usuario_cargo__id_cargo__cargo="Técnico")
+
+      if fecha_inicio:
+         solicitudes = solicitudes.filter(fecha_ingreso__gte=fecha_inicio)
+      if fecha_fin:
+         solicitudes = solicitudes.filter(fecha_ingreso__lte=fecha_fin)
+
+      for tecnico in horas_por_tecnico:
+         solicitudes_tecnico = solicitudes.filter(id_usuario_cargo__id__username=tecnico)
+         total = solicitudes_tecnico.count()
+         cerradas = solicitudes_tecnico.filter(id_estado__nombre__icontains="cerrado").count()
+         pendientes = total - cerradas
+         rendimiento[tecnico] = {
+            "horas": horas_por_tecnico[tecnico],
+            "total": total,
+            "cerradas": cerradas,
+            "pendientes": pendientes,
+         }
+         chart_labels.append(tecnico)
+         chart_data.append(horas_por_tecnico[tecnico])
+         recibidas_data.append(total)
+         cerradas_data.append(cerradas)
+         pendientes_data.append(pendientes)
+
+    # PDF
+   if 'generar_pdf' in request.GET:
+      template = get_template('rendimientoTecnicosEstadistica.html')
+      html = template.render({
+                "rendimiento": rendimiento,
+                "fecha_actual": datetime.now().strftime("%d/%m/%Y %I:%M %p"),
+      })
+      response = HttpResponse(content_type='application/pdf')
+      response['Content-Disposition'] = 'attachment; filename="rendimiento_tecnicos.pdf"'
+      pisa.CreatePDF(html, dest=response)
+      return response
+
+   context = {
+      "form": form,
+      "rendimiento": rendimiento,
+      "labels": chart_labels,
+      "data": chart_data,
+      "recibidas_data": recibidas_data,
+      "cerradas_data": cerradas_data,
+      "pendientes_data": pendientes_data,
+      "titulo": "Estadística de rendimiento de los técnicos"
+   }
+
+   return render(request, 'rendimientoTecnicosFiltro.html', context)

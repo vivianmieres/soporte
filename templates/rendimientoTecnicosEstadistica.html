@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid black; padding: 4px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Rendimiento de Técnicos</h2>
+    <p>Generado: {{ fecha_actual }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Técnico</th>
+                <th>Horas trabajadas</th>
+                <th>Solicitudes recibidas</th>
+                <th>Cerradas</th>
+                <th>Pendientes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tecnico, datos in rendimiento.items %}
+            <tr>
+                <td>{{ tecnico }}</td>
+                <td>{{ datos.horas|floatformat:2 }}</td>
+                <td>{{ datos.total }}</td>
+                <td>{{ datos.cerradas }}</td>
+                <td>{{ datos.pendientes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

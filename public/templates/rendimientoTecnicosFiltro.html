@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block incluir_navbar %}{% include "navbar.html" %}{% endblock %}
+
+{% block reporte %}
+<div class="container mt-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            {{ form.fecha_inicio.label_tag }}
+            {{ form.fecha_inicio }}
+        </div>
+        <div class="col-md-4">
+            {{ form.fecha_fin.label_tag }}
+            {{ form.fecha_fin }}
+        </div>
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <button type="submit" name="generar_pdf" class="btn btn-primary">Generar PDF</button>
+        </div>
+    </form>
+
+    {% if rendimiento %}
+    <div class="mt-5">
+        <h5>Resultados:</h5>
+        <table class="table table-bordered mt-3">
+            <thead class="table-light">
+                <tr>
+                    <th>Técnico</th>
+                    <th>Horas trabajadas</th>
+                    <th>Solicitudes recibidas</th>
+                    <th>Cerradas</th>
+                    <th>Pendientes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tecnico, datos in rendimiento.items %}
+                <tr>
+                    <td>{{ tecnico }}</td>
+                    <td>{{ datos.horas|floatformat:2 }}</td>
+                    <td>{{ datos.total }}</td>
+                    <td>{{ datos.cerradas }}</td>
+                    <td>{{ datos.pendientes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-5">
+        <h5>Gráficas de horas trabajadas por Técnico</h5>
+        <canvas id="grafico" width="800" height="400"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        const ctx = document.getElementById('grafico').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [{
+                    label: 'Horas trabajadas',
+                    data: {{ data|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Horas'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <div class="mt-5">
+        <h5>Gráfica de Solicitudes por Técnico</h5>
+        <canvas id="grafico_solicitudes" width="800" height="400"></canvas>
+    </div>
+
+
+    <script>
+        const ctx2 = document.getElementById('grafico_solicitudes').getContext('2d');
+        const chart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [
+                {
+                    label: 'Recibidas',
+                    data: {{ recibidas_data|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Cerradas',
+                    data: {{ cerradas_data|safe }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Pendientes',
+                    data: {{ pendientes_data|safe }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                        display: true,
+                        text: 'Cantidad de Solicitudes'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+    {% else %}
+    <p class="mt-4">No se encontraron resultados.</p>
+    {% endif %}
+</div>
+{% endblock %}

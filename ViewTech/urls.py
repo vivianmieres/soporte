@@ -86,7 +86,8 @@ urlpatterns = [
    path("reporte/solicitud_reporte/", views.solicitud_reporte, name="Solicitud_reporte"),
    path("reporte/estado_tiempo_res_reporte/", views.estado_tiempo_resolucion_reporte, name="Estado_tiempo_res_reporte"),
    path("reporte/repuestos_acc_usados_reporte/", views.repuestos_acc_usados_reporte, name="Repuestos_acc_usados_reporte"), 
-   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),                                                       
+   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),  
+   path("reporte/rendimiento_tecnicos_estadistica/", views.rendimiento_tecnicos_estadistica, name="Rendimiento_tecnico_estadistica"),                                                     
 ]
 
 
