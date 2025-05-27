@@ -1376,8 +1376,7 @@ def repuestos_acc_usados_reporte(request):
             Q(id_solicitud__id_equipo__id_cliente__nombres__icontains=cd['cliente']) |
             Q(id_solicitud__id_equipo__id_cliente__apellidos__icontains=cd['cliente'])
          )
-      if cd["repuesto"]:
-         usados = usados.filter(id_repuesto_acc=cd["repuesto"])
+      
       if cd["fecha_inicio"]:
          usados = usados.filter(fecha_asignacion__gte=cd["fecha_inicio"])
       if cd["fecha_fin"]:

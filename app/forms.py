@@ -756,12 +756,10 @@ class FiltroEstadoTiempoResolucionForm(forms.Form):
         self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
 
 class FiltroRepuestoAccUsadosForm(forms.Form):
-    cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.all(),
+    cliente = forms.CharField(
         required=False,
-        label="Cliente",
-        empty_label="Todos los clientes",
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label="Cliente (nombre o apellido)",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     fecha_inicio = forms.DateField(
         required=False,
@@ -789,7 +787,7 @@ class FiltroRepuestoAccUsadosForm(forms.Form):
             }
         )
     )
-
+    
 class FiltroRendimientoTecnicoForm(forms.Form):
     fecha_inicio = forms.DateField(
         required=False,
