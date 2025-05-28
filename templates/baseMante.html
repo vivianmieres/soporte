@@ -4,25 +4,24 @@
     {% include "navbar.html" %}
 {%endblock%}
 
-
 {%block contenido%}
-{% load static %}   
+{% load static %}
 <div class="px-5 py-4 my-4 text-center">
-    
-    {% comment %} <img class="d-block mx-auto mb-4" src="{% static '/img/turno.png' %}" alt="" width="82" height="67"> {% endcomment %}
     <div class=" text-start">
         <div class="container col- col-md-3 border p-3">
-            <form  method= "POST" action="">{% csrf_token %}
+            <form  method= "POST" action="" novalidate>{% csrf_token %}
                 {{form.as_p}}
                 
                 <div class="d-flex justify-content-between mt-3">
                     <input type="submit" name="Cancelar" class="btn btn-primary" value="Cancelar">
                     <input type="submit" name="Guardar" class="btn btn-primary" value="Guardar">
                 </div>
-            </from>
+                
+            </form>
           </div>
           
     </div>
 </div>
 {% include "botonAtras.html" %}
 {%endblock%}
+
