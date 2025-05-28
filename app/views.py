@@ -22,6 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now
 from collections import defaultdict
+from app.utils.whatsapp import send_whatsapp_message
 # Create your views here.
 
 def Login(request):
@@ -60,7 +61,7 @@ def Principal(request):
    return render(request, 'principal.html', {})
 
 #MODULO USUARIO
-#Consulta
+#Consulta de usuario
 def usuario_consulta(request):
    usuarios = []
    usuarios = models.AuthUser.objects.all()
@@ -86,7 +87,7 @@ def usuario_consulta(request):
    } 
    return render(request,"usuarioConsulta.html",context)
 
-#Mantenimiento
+#Mantenimiento de usuario
 def usuario_mante(request):
    if request.method=="POST":
       if 'Cancelar' in request.POST:
@@ -838,6 +839,9 @@ def solicitud_mante_pk(request,pk):
       
       if form.is_valid():    
          with transaction.atomic():
+            # views.py o shell
+            #send_whatsapp_message("+595961408264", "Prueba desde Django")   
+
             solicitud_actualizada = form.save(commit=False)
             nuevo_estado = solicitud_actualizada.id_estado
 

@@ -151,3 +151,7 @@ MEDIA_ROOT= os.path.join(os.path.dirname(BASE_DIR),"static_env","media_root")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'auth.User'
+
+TWILIO_ACCOUNT_SID = 'AC9d2d99bdd5f0ecc56d60462396f9fb23'
+TWILIO_AUTH_TOKEN = '61adbc0af46f6fb85f13f0d3f8d3fe38'
+TWILIO_WHATSAPP_NUMBER = '+14155238886'
