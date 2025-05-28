@@ -42,6 +42,7 @@
                     <th>Tipo de estado</th>
                     <th>Descripción</th>
                     <th>Fecha Ingreso</th>
+                    <th>Fecha Cierre</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +55,7 @@
                     <td>{{ s.id_estado.nombre }}</td>
                     <td>{{ s.descripcion }}</td>
                     <td>{{ s.fecha_ingreso }}</td>
+                    <td>{% if s.fecha_cierre %}{{ s.fecha_cierre }}{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>

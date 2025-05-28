@@ -1291,7 +1291,7 @@ def repuesto_acc_inventario(request):
    if form.is_valid():
       cd = form.cleaned_data
       if cd["tipo"]:
-         repuestos = repuestos.filter(id_tipo_repuesto_acc=cd["tipo"])
+         repuestos = repuestos.filter(id_tipo_repuesto_acc__nombre__icontains=cd["tipo"])
       if cd["marca"]:
          repuestos = repuestos.filter(marca__icontains=cd["marca"])
 

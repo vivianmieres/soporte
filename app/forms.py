@@ -102,6 +102,72 @@ class ClienteWidget(ModelSelect2Widget):
 
     def label_from_instance(self, obj):
         return f"{obj.apellidos}, {obj.nombres}"
+    
+#widget del equipo de un cliente
+class EquipoWidget(ModelSelect2Widget):
+    model = Equipo
+    search_fields = [
+        "id_cliente__nombres__icontains",
+        "id_cliente__apellidos__icontains",
+        "id_tipo_equipo__descripcion",
+    ]
+
+    def label_from_instance(self, obj):
+        return f"{obj.id_cliente.nombres} {obj.id_cliente.apellidos}-{obj.id_tipo_equipo.descripcion} {obj.marca} {obj.modelo}"
+
+
+#widget de tipo equipo
+class TipoEquipoWidget(ModelSelect2Widget):
+    model = Tipo_equipo
+    search_fields = [
+        "descripcion__icontains",
+    ]
+
+    def label_from_instance(self, obj):
+        return obj.descripcion
+
+#Widget de solicitud    
+class SolicitudWidget(ModelSelect2Widget):
+    model = Solicitud
+    search_fields = [
+        "id_solicitud__icontains",
+        "descripcion__icontains",
+        "id_equipo__id_cliente__nombres__icontains",
+        "id_equipo__id_cliente__apellidos__icontains",
+    ]
+
+    def label_from_instance(self, obj):
+        return (
+            f"#{obj.id_solicitud} - {obj.descripcion} - "
+            f"{obj.id_equipo.id_cliente.nombres} {obj.id_equipo.id_cliente.apellidos} - "
+            f"{obj.id_equipo.id_tipo_equipo.descripcion} {obj.id_equipo.marca} {obj.id_equipo.modelo}"
+        )
+
+#Widget de repuesto/accesorio    
+class RepuestoAccWidget(ModelSelect2Widget):
+    model = Repuesto_accesorio
+    search_fields = [
+        "descripcion__icontains",
+        "marca__icontains",
+        "id_tipo_repuesto_acc__nombre__icontains",
+    ]
+
+    def label_from_instance(self, obj):
+        return (
+            f"{obj.id_tipo_repuesto_acc.nombre} - {obj.marca or ''} {obj.descripcion} "
+            f"(Stock: {obj.stock})"
+        ).strip()
+    
+#widget de tipo repuesto/accesorio
+class TipoRepuestoAccWidget(ModelSelect2Widget):
+    model = Tipo_repuesto_acc
+    search_fields = [
+        "nombre__icontains",
+    ]
+
+    def label_from_instance(self, obj):
+        return obj.nombre
+       
 		
 #Mantenimiento cliente
 class CargaClienteForm(forms.ModelForm):
@@ -293,7 +359,8 @@ class CargaEquipoForm(forms.ModelForm):
         fields= ["id_equipo","id_cliente","id_tipo_equipo","descripcion","marca","modelo","serie"]
         
         widgets ={
-       'id_cliente': ClienteWidget(attrs={'class': 'form-control select2-custom'})
+       'id_cliente': ClienteWidget(attrs={'class': 'form-control select2-custom'}),
+       'id_tipo_equipo': TipoEquipoWidget(attrs={'class': 'form-control select2-custom'})
         }  
 
         labels = {
@@ -338,19 +405,7 @@ class CargaEstadoForm(forms.ModelForm):
         descrip = self.cleaned_data.get("nombre")
         if descrip == "" or descrip == None:
             raise forms.ValidationError("El campo Nombre no puede quedar vacio")
-
-#widget del equipo de un cliente
-class EquipoWidget(ModelSelect2Widget):
-    model = Equipo
-    search_fields = [
-        "id_cliente__nombres__icontains",
-        "id_cliente__apellidos__icontains",
-        "id_tipo_equipo__descripcion",
-    ]
-
-    def label_from_instance(self, obj):
-        return f"{obj.id_cliente.nombres} {obj.id_cliente.apellidos}-{obj.id_tipo_equipo.descripcion} {obj.marca} {obj.modelo}"
-
+        
 #Mantenimiento solicitud
 class CargaSolicitudForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -492,8 +547,7 @@ class CargaTipoRepuestoAccForm(forms.ModelForm):
 class CargaRepuestoAccForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-       
-        id_tipo_repuesto_acc = forms.ModelChoiceField(queryset= Tipo_repuesto_acc.objects.all())
+
 
         self.fields["id_tipo_repuesto_acc"].widget.attrs.update({
             'class':'form-control'
@@ -518,6 +572,10 @@ class CargaRepuestoAccForm(forms.ModelForm):
     class Meta:
         model= Repuesto_accesorio
         fields= ["id_repuesto_acc","id_tipo_repuesto_acc","marca","descripcion","precio","cant"]
+
+        widgets = {
+            'id_tipo_repuesto_acc': TipoRepuestoAccWidget(attrs={'class': 'form-control select2-custom'}),
+        }
  
         labels = {
             'id_tipo_repuesto_acc': 'Tipo de repuesto/accesorio'
@@ -588,6 +646,11 @@ class CargaSolicitudRepuestoAccForm(forms.ModelForm):
     class Meta:
         model= Solicitud_repuesto_acc
         fields= ["id_solicitud_repuesto_acc","id_solicitud","id_repuesto_acc","fecha_asignacion"]
+
+        widgets = {
+            'id_solicitud': SolicitudWidget(attrs={'class': 'form-control select2-custom'}),
+            'id_repuesto_acc': RepuestoAccWidget(attrs={'class': 'form-control select2-custom'}),
+        }
  
         labels = {
             'id_solicitud': 'Solicitud de un cliente',
@@ -699,12 +762,10 @@ class FiltroSolicitudForm(forms.Form):
         self.fields['estado'].label_from_instance = lambda obj: f"{obj.id_estado} - {obj.nombre}"
 
 class FiltroRepuestoAccForm(forms.Form):
-    tipo = forms.ModelChoiceField(
-        queryset= Tipo_repuesto_acc.objects.all(),
+    tipo = forms.CharField(
         required=False,
         label="Tipo de Repuesto/Accesorio",
-        empty_label="Todos los tipos de respuestos/accesorios",
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     marca = forms.CharField(
         required=False,

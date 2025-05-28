@@ -10,6 +10,7 @@
 </head>
 <body>
     <h2>Reporte de Solicitudes</h2>
+    <p>Generado: {{ fecha_actual }}</p>
     <table>
         <thead>
             <tr>
@@ -20,6 +21,7 @@
                 <th>Estado</th>
                 <th>Descripción</th>
                 <th>Fecha Ingreso</th>
+                <th>Fecha Cierre</th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +34,7 @@
                 <td>{{ s.id_estado.descripcion }}</td>
                 <td>{{ s.descripcion }}</td>
                 <td>{{ s.fecha_ingreso }}</td>
+                <td>{% if s.fecha_cierre %}{{ s.fecha_cierre }}{% else %}—{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>
