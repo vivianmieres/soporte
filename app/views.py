@@ -5,6 +5,7 @@ from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, Carga
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
 from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm, FiltroRepuestoAccUsadosForm
 from .forms import FiltroRendimientoTecnicoForm
+from .models import Encuesta_pregunta, Encuesta_respuesta, Encuesta_cab, Encuesta_det_pregunta, Encuesta_det_respuesta
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Count
@@ -23,6 +24,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from collections import defaultdict
 from app.utils.whatsapp import send_whatsapp_message
+from django.core.paginator import Paginator
 # Create your views here.
 
 def Login(request):
@@ -80,9 +82,15 @@ def usuario_consulta(request):
          return redirect('Usuario_mante_pk',pk=pk_user.id)
       else: 
          messages.error(request,"No se selecciono a un Usuario")
+		 
+   paginator = Paginator(usuarios, 5)  # 5 solicitudes por página
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+	
    context = {
       'titulo'      : "Consulta de Usuario",
-      'usuario'     : usuarios
+      'page_obj': page_obj,
+      'usuario': page_obj,
 
    } 
    return render(request,"usuarioConsulta.html",context)
@@ -387,10 +395,15 @@ def cliente_consulta(request):
          return redirect('Cliente_mante_pk',pk=pk_cliente.id_cliente)
       else: 
          messages.error(request,"No se selecciono a un cliente")
+		 
+   paginator = Paginator(clientes, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
 
    context = {
       'titulo'      : "Consulta de Cliente",
-      'cliente'     : clientes,
+      'page_obj': page_obj,
+      'cliente': page_obj,
       #'busqueda'    : tipo_busqueda
 
    } 
@@ -475,9 +488,14 @@ def telefono_consulta(request):
       else: 
          messages.error(request,"No se selecciono un telefono")
 
+   paginator = Paginator(telefonos, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
       'titulo'      : "Consulta de telefono de Cliente",
-      'telefono'     : telefonos,
+      'page_obj': page_obj,
+      'telefono': page_obj,
    } 
    return render(request,"telefonoConsulta.html",context)  
 
@@ -621,10 +639,15 @@ def equipo_consulta(request):
          return redirect('Equipo_mante_pk',pk=pk_equipo.id_equipo)
       else: 
          messages.error(request,"No se selecciono ningun equipo")
+		 
+   paginator = Paginator(equipo, 5) 
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
 
    context = {
       'titulo'      : "Consulta de Equipo",
-      'equipo'     : equipo,
+      'page_obj': page_obj,
+      'equipo': page_obj,
    } 
    return render(request,"equipoConsulta.html",context)
 
@@ -699,10 +722,15 @@ def tipo_equipo_consulta(request):
          return redirect('Tipo_equipo_mante_pk',pk=pk_tipo_eq.id_tipo_equipo)
       else: 
          messages.error(request,"No se selecciono ningun tipo de equipo")
+	
+   paginator = Paginator(tipo_eq, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
 
    context = {
-      'titulo'      : "Consulta de Tipo de Equipo",
-      'tipo_equipo'     : tipo_eq,
+      'titulo'     : "Consulta de Tipo de Equipo",
+      'page_obj'   : page_obj,
+      'tipo_equipo': page_obj,
    } 
    return render(request,"tipoEquipoConsulta.html",context)
 
@@ -782,9 +810,15 @@ def solicitud_consulta(request):
       else: 
          messages.error(request,"No se selecciono ninguna Solicitud")
 
+	# Paginación
+   paginator = Paginator(solicitud, 5)  # 5 por página
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
-      'titulo'      : "Consulta de Solicitud",
-      'solicitud'     : solicitud,
+      'titulo'    : "Consulta de Solicitud",
+      'page_obj'  : page_obj,
+      'solicitud' : page_obj,
    } 
    return render(request,"solicitudConsulta.html",context)
 
@@ -906,9 +940,14 @@ def solicitud_repuesto_acc_consulta(request):
       else: 
          messages.error(request,"No se ha asignado ningun repuesto a la Solicitud")
 
+   paginator = Paginator(solicitud_repuesto_acc, 5)  # 5 solicitudes por página
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
       'titulo'      : "Consulta de asignacion de repuesto/accesorio en una solicitud",
-      'solicitud_repuesto_acc'     : solicitud_repuesto_acc,
+      'page_obj': page_obj,
+      'solicitud_repuesto_acc': page_obj,
    } 
    return render(request,"solicitudRepuestoAccConsulta.html",context)
 
@@ -1020,9 +1059,15 @@ def estado_consulta(request):
       else: 
          messages.error(request,"No se selecciono tipo de estado de una solicitud")
 
+	#paginador
+   paginator = Paginator(estado, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
-      'titulo'      : "Consulta de Tipo de estado",
-      'estado'     : estado,
+      'titulo'  : "Consulta de Tipo de estado",
+      'page_obj': page_obj,
+      'estado'  : page_obj,
    } 
    return render(request,"estadoConsulta.html",context)
 
@@ -1104,9 +1149,14 @@ def repuesto_acc_consulta(request):
       else: 
          messages.error(request,"No se selecciono ningun repuesto/accesorio")
 
+   paginator = Paginator(repuesto_acc, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
-      'titulo'           : "Consulta de Repuesto/Accesorio",
-      'repuesto_acc'     : repuesto_acc,
+      'titulo'      : "Consulta de Repuesto/Accesorio",
+      'page_obj'    : page_obj,
+      'repuesto_acc': page_obj,
    } 
    return render(request,"repuestoAccConsulta.html",context)
 
@@ -1182,9 +1232,14 @@ def tipo_repuesto_acc_consulta(request):
       else: 
          messages.error(request,"No se selecciono ningun tipo de repuesto/accesorio")
 
+   paginator = Paginator(tipo_repuesto_acc, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
       'titulo'                : "Consulta de Tipo de Repuesto/Accesorio",
-      'tipo_repuesto_acc'     : tipo_repuesto_acc,
+      'page_obj': page_obj,
+      'tipo_repuesto_acc': page_obj,
    } 
    return render(request,"tipoRepuestoAccConsulta.html",context)
 
@@ -1274,11 +1329,16 @@ def solicitud_reporte(request):
       response['Content-Disposition'] = 'attachment; filename="reporte_solicitudes.pdf"'
       pisa.CreatePDF(html, dest=response)
       return response
+   
+   paginator = Paginator(solicitudes, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)  
       
    context = {
       'titulo': "Reporte de solicitudes",
       'form'  : form,
-      'solicitudes': solicitudes
+      'page_obj': page_obj,
+      'solicitudes': page_obj,
    } 
 
    return render(request, "solicitudFiltro.html", context)
@@ -1308,11 +1368,16 @@ def repuesto_acc_inventario(request):
       response['Content-Disposition'] = 'attachment; filename="inventario_repuestos_acc.pdf"'
       pisa.CreatePDF(html, dest=response)
       return response
-      
+   
+   paginator = Paginator(repuestos, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+
    context = {
       'titulo': "Inventario de Repuestos/Accesorios en PDF",
       'form'  : form,
-      'repuestos': repuestos
+      'page_obj': page_obj,
+      'repuestos': page_obj,
    } 
 
    return render(request, "repuestoAccFiltro.html", context)
@@ -1357,11 +1422,16 @@ def estado_tiempo_resolucion_reporte(request):
       response['Content-Disposition'] = 'attachment; filename="estado_tiempo_resolucion.pdf"'
       pisa.CreatePDF(html, dest=response)
       return response
+   
+   paginator = Paginator(historicos, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
 
    context = {
       'titulo': "Reporte de Tiempo de Resolución por tipo de estado de una solicitud",
       'form': form,
-      'historicos': historicos
+      'page_obj': page_obj,
+      'historicos': page_obj,
    }
 
    return render(request, "estadoTiempoResolucionFiltro.html", context)
@@ -1369,8 +1439,8 @@ def estado_tiempo_resolucion_reporte(request):
 def repuestos_acc_usados_reporte(request):
    form = FiltroRepuestoAccUsadosForm(request.GET or None)
    usados = models.Solicitud_repuesto_acc.objects.select_related(
-      "id_solicitud", "id_repuesto_acc",
-      "id_solicitud__id_equipo__id_cliente"
+     "id_solicitud", "id_repuesto_acc",
+     "id_solicitud__id_equipo__id_cliente"
    )
 
    if form.is_valid():
@@ -1379,14 +1449,14 @@ def repuestos_acc_usados_reporte(request):
          usados = usados.filter(
             Q(id_solicitud__id_equipo__id_cliente__nombres__icontains=cd['cliente']) |
             Q(id_solicitud__id_equipo__id_cliente__apellidos__icontains=cd['cliente'])
-         )
+      )
       
       if cd["fecha_inicio"]:
          usados = usados.filter(fecha_asignacion__gte=cd["fecha_inicio"])
       if cd["fecha_fin"]:
          usados = usados.filter(fecha_asignacion__lte=cd["fecha_fin"])
 
-   usados = usados.order_by("fecha_asignacion")
+      usados = usados.order_by("fecha_asignacion")
 
    if 'generar_pdf' in request.GET:
       template = get_template("repuestosAccUsadosReporte.html")
@@ -1398,11 +1468,16 @@ def repuestos_acc_usados_reporte(request):
       response['Content-Disposition'] = 'attachment; filename="historico_equipo.pdf"'
       pisa.CreatePDF(html, dest=response)
       return response
-
+   
+   paginator = Paginator(usados, 5)  
+   page_number = request.GET.get("page")
+   page_obj = paginator.get_page(page_number)
+   
    context = {
-        "form": form,
-        "usados": usados,
-        "titulo": "Reporte de histórico por Equipo"
+      'form': form,
+      'titulo': "Reporte de histórico por Equipo",
+      'page_obj': page_obj,
+      'usados': page_obj,
    }
    return render(request, "repuestosAccUsadosFiltro.html", context)
 

@@ -29,6 +29,7 @@
                 <thead class="table-primary">
                     <tr>
                     <th scope="col"></th>
+                    <th scope="col">Nro.</th>
                     <th scope="col">Descripcion</th>
                     </tr>
                 </thead>
@@ -39,6 +40,9 @@
                         <input type="radio" value="{{obj}}" name="tipo_eq_seleccionado">
                     </td> 
                     <td>
+                        {{obj.id_tipo_equipo}} 
+                    </td>
+                    <td>
                         {{obj.descripcion}} 
                     </td>
                     </tr>                
@@ -46,7 +50,36 @@
                     <p>No hay registros.</p>
                     {%endfor%} 
                 </tbody>
-            </table>                                          
+            </table>    
+            <div class="d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">Anterior</a>
+                           </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">Siguiente</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>                                          
             <input type="submit" class="btn btn-primary" value="Modificar"> 
         </form>     
     </div>
@@ -55,8 +88,10 @@
 {%endblock%}
 
 {%block botones%}
+
 <div class="d-flex gap-2 justify-content-center py-1">
     <a href="{%url 'Tipo_equipo_mante'%}" class="btn btn-lg btn-primary">Nuevo Registro</a>
-</div>    
-{% include "botonAtras.html" %}
+</div>   
+{% include "botonAtras.html" %} 
 {%endblock%}
+
