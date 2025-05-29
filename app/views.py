@@ -5,7 +5,7 @@ from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, Carga
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
 from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm, FiltroRepuestoAccUsadosForm
 from .forms import FiltroRendimientoTecnicoForm
-from .models import Encuesta_pregunta, Encuesta_respuesta, Encuesta_cab, Encuesta_det_pregunta, Encuesta_det_respuesta
+#from .models import Encuesta_pregunta, Encuesta_respuesta, Encuesta_cab, Encuesta_det_pregunta, Encuesta_det_respuesta
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Count
@@ -1472,7 +1472,7 @@ def repuestos_acc_usados_reporte(request):
    paginator = Paginator(usados, 5)  
    page_number = request.GET.get("page")
    page_obj = paginator.get_page(page_number)
-   
+
    context = {
       'form': form,
       'titulo': "Reporte de histórico por Equipo",
