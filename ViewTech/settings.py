@@ -155,3 +155,11 @@ AUTH_USER_MODEL = 'auth.User'
 TWILIO_ACCOUNT_SID = 'AC9d2d99bdd5f0ecc56d60462396f9fb23'
 TWILIO_AUTH_TOKEN = 'a6b7a9eb7aeab5932a92a4c82ca782bf'
 TWILIO_WHATSAPP_NUMBER = '+14155238886'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'karinarole94@fpuna.edu.py'
+EMAIL_HOST_PASSWORD = 'mmdc zaxe ywmk iltl'
+DEFAULT_FROM_EMAIL = 'karinarole94@fpuna.edu.py'

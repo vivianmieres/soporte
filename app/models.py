@@ -152,6 +152,7 @@ class Cliente(models.Model):
 class Prestadora(models.Model):
     id_prestadora = models.AutoField(primary_key=True)
     empresa = models.CharField(max_length=100, unique= True)
+    servidor = models.CharField(max_length=50)
     activo = models.BooleanField(default= True)
 
     def __str__(self) -> str:
@@ -323,3 +324,12 @@ class Solicitud_estado_historico(models.Model):
     class Meta:
         managed = False
         db_table = 'solicitud_estado_historico'
+
+class Parametro(models.Model):
+    id_parametro = models.AutoField(primary_key=True)
+    notificacion_whatsapp = models.BooleanField(default=False)
+    notificacion_sms = models.BooleanField(default=True) 
+
+    class Meta:
+        managed = False
+        db_table = 'parametro' 

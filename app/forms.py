@@ -292,10 +292,14 @@ class CargaPrestadoraForm(forms.ModelForm):
         self.fields["empresa"].widget.attrs.update({
             'class':'form-control'
         })
+
+        self.fields["servidor"].widget.attrs.update({
+            'class':'form-control'
+        }) 
             
     class Meta:
         model= Prestadora
-        fields= ["empresa","activo"]
+        fields= ["empresa","servidor","activo"]
         error_messages = {
             "empresa": { "unique": "Esta empresa ya se cargo anteriormente."}
         }        
