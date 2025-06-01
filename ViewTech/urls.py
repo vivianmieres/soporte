@@ -88,6 +88,9 @@ urlpatterns = [
    path("reporte/repuestos_acc_usados_reporte/", views.repuestos_acc_usados_reporte, name="Repuestos_acc_usados_reporte"), 
    path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),  
    path("reporte/rendimiento_tecnicos_estadistica/", views.rendimiento_tecnicos_estadistica, name="Rendimiento_tecnico_estadistica"),                                                     
+   #encuesta de satisfaccion al cliente 
+   path("encuesta_satifaccion_cliente/encuesta/", views.encuesta_satisfaccion, name="Encuesta_satisfaccion_cliente"),
+   path("encuesta_satifaccion_cliente/gracias", views.encuesta_gracias, name="Encuesta_gracias"),
 ]
 
 

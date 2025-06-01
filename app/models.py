@@ -325,6 +325,55 @@ class Solicitud_estado_historico(models.Model):
         managed = False
         db_table = 'solicitud_estado_historico'
 
+class Encuesta_cab(models.Model):
+    id_encuesta_cab = models.AutoField(primary_key=True)
+    id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
+    fecha_encuesta = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'encuesta_cab'
+
+class Encuesta_pregunta(models.Model):
+    id_encuesta_pregunta = models.AutoField(primary_key= True)
+    pregunta = models.TextField()
+    es_seleccion_multiple = models.BooleanField(default=False)
+    activo = models.BooleanField(default=True) 
+
+    class Meta:
+        managed = False
+        db_table = 'encuesta_pregunta'
+
+class Encuesta_respuesta(models.Model):
+    id_encuesta_respuesta = models.AutoField(primary_key= True)
+    id_encuesta_pregunta = models.ForeignKey(Encuesta_pregunta, models.DO_NOTHING, db_column='id_encuesta_pregunta')
+    respuesta = models.TextField()
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        managed = False
+        db_table = 'encuesta_respuesta'
+
+class Encuesta_det_pregunta(models.Model):
+    id_encuesta_det_pregunta = models.AutoField(primary_key=True)
+    id_encuesta_cab = models.ForeignKey(Encuesta_cab, models.DO_NOTHING, db_column='id_encuesta_cab')
+    id_encuesta_pregunta = models.ForeignKey(Encuesta_pregunta, models.DO_NOTHING, db_column = 'id_encuesta_pregunta')
+
+    class Meta:
+        managed = False
+        db_table = 'encuesta_det_pregunta'
+
+class Encuesta_det_respuesta(models.Model):
+    id_encuesta_det_respuesta = models.AutoField(primary_key=True)
+    id_encuesta_det_pregunta = models.ForeignKey(Encuesta_det_pregunta, models.DO_NOTHING, db_column='id_encuesta_det_pregunta')
+    id_encuesta_respuesta = models.ForeignKey(Encuesta_pregunta, models.DO_NOTHING, db_column='id_encuesta_pregunta')
+    seleccionado = models.BooleanField(default=True) 
+    activo = models.BooleanField(default=True) 
+
+    class Meta:
+        managed = False
+        db_table = 'encuesta_det_respuesta'
+
 class Parametro(models.Model):
     id_parametro = models.AutoField(primary_key=True)
     notificacion_whatsapp = models.BooleanField(default=False)

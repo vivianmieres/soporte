@@ -5,7 +5,7 @@ from .forms import CargaTelefonoForm, CargaPrestadoraForm, CargaCargoForm, Carga
 from .forms import CargaEquipoForm, CargaSolicitudForm, CargaEstadoForm, CargaTipoRepuestoAccForm, CargaRepuestoAccForm
 from .forms import FiltroSolicitudForm, FiltroRepuestoAccForm, FiltroEstadoTiempoResolucionForm, FiltroRepuestoAccUsadosForm
 from .forms import FiltroRendimientoTecnicoForm
-#from .models import Encuesta_pregunta, Encuesta_respuesta, Encuesta_cab, Encuesta_det_pregunta, Encuesta_det_respuesta
+from .models import Encuesta_pregunta, Encuesta_respuesta, Encuesta_cab, Encuesta_det_pregunta, Encuesta_det_respuesta
 from . import models
 from django.contrib import messages
 from django.db.models import Q, Count
@@ -1573,3 +1573,41 @@ def rendimiento_tecnicos_estadistica(request):
    }
 
    return render(request, 'rendimientoTecnicosFiltro.html', context)
+
+def encuesta_satisfaccion(request, id_solicitud):
+   preguntas = Encuesta_pregunta.objects.filter(activo=True)
+    
+   # Adjuntar las respuestas activas a cada pregunta
+   for p in preguntas:
+      p.respuestas = Encuesta_respuesta.objects.filter(id_encuesta_pregunta=p, activo=True)
+
+   if request.method == "POST":
+      # Crear cabecera de la encuesta
+      cab = Encuesta_cab.objects.create(
+         id_solicitud_id=id_solicitud,
+         fecha_encuesta=now()
+      )
+
+      # Procesar respuestas
+      for pregunta in preguntas:
+         respuestas_ids = request.POST.getlist(f"pregunta_{pregunta.id_encuesta_pregunta}")
+         if respuestas_ids:
+            det_pregunta = Encuesta_det_pregunta.objects.create(
+               id_encuesta_cab=cab,
+               id_encuesta_pregunta=pregunta
+            )
+            for r_id in respuestas_ids:
+               Encuesta_det_respuesta.objects.create(
+                  id_encuesta_det_pregunta=det_pregunta,
+                  id_encuesta_respuesta_id=r_id,
+                  seleccionado=True,
+                  activo=True
+               )
+
+      return redirect("Encuesta_gracias")  # o como se llame tu vista de agradecimiento
+
+   context = {
+      "preguntas": preguntas   
+   }
+
+   return render(request, "encuestaSatisfaccionCliente.html", context)
