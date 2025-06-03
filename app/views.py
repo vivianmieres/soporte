@@ -1611,3 +1611,27 @@ def encuesta_satisfaccion(request, id_solicitud):
    }
 
    return render(request, "encuestaSatisfaccionCliente.html", context)
+
+def dashboard_solicitudes(request):
+   mes_actual = request.GET.get('mes')
+   if not mes_actual:
+      mes_actual = now().month
+
+   meses = list(range(1, 13))  
+   solicitudes = models.Solicitud.objects.filter(fecha_ingreso__month=mes_actual)
+
+   total = solicitudes.count()
+   por_estado = solicitudes.values('id_estado__nombre').annotate(cantidad=Count('id_estado'))
+
+   abiertas = solicitudes.filter(id_estado__nombre__icontains="Abierto").count()
+   cerradas = solicitudes.filter(id_estado__nombre__icontains="Cerrado").count()
+
+   context = {
+      'total': total,
+      'por_estado': por_estado,
+      'abiertas': abiertas,
+      'cerradas': cerradas,
+      'mes_actual': int(mes_actual),
+      'meses': meses,
+   }
+   return render(request, 'dashboardSolicitud.html', context)
