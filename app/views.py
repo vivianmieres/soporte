@@ -1612,6 +1612,11 @@ def encuesta_satisfaccion(request, id_solicitud):
 
    return render(request, "encuestaSatisfaccionCliente.html", context)
 
+
+def encuesta_gracias(request):
+   return render(request, "encuestaGracias.html", {})
+
+
 def dashboard_solicitudes(request):
    mes_actual = request.GET.get('mes')
    if not mes_actual:
