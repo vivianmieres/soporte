@@ -86,11 +86,8 @@ urlpatterns = [
    path("reporte/solicitud_reporte/", views.solicitud_reporte, name="Solicitud_reporte"),
    path("reporte/estado_tiempo_res_reporte/", views.estado_tiempo_resolucion_reporte, name="Estado_tiempo_res_reporte"),
    path("reporte/repuestos_acc_usados_reporte/", views.repuestos_acc_usados_reporte, name="Repuestos_acc_usados_reporte"), 
-   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),  
-   path("reporte/rendimiento_tecnicos_estadistica/", views.rendimiento_tecnicos_estadistica, name="Rendimiento_tecnico_estadistica"),                                                     
-   #encuesta de satisfaccion al cliente 
-   path("encuesta_satifaccion_cliente/encuesta/", views.encuesta_satisfaccion, name="Encuesta_satisfaccion_cliente"),
-   path("encuesta_satifaccion_cliente/gracias", views.encuesta_gracias, name="Encuesta_gracias"),
+   path("reporte/repuesto_acc_inventario/", views.repuesto_acc_inventario, name="Repuesto_acc_inventario"),
+   path("reporte/rendimiento_tecnicos_estadistica/", views.rendimiento_tecnicos_estadistica, name="Rendimiento_tecnico_estadistica"),                                                          
    #dashboard
    path('dashboard/solicitud', views.dashboard_solicitudes, name='Dashboard_solicitudes'),
    path('dashboard/encuesta', views.dashboard_encuesta, name='Dashboard_encuesta'),
@@ -104,4 +101,3 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
