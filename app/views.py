@@ -1574,7 +1574,7 @@ def rendimiento_tecnicos_estadistica(request):
 
    return render(request, 'rendimientoTecnicosFiltro.html', context)
 
-def encuesta_satisfaccion(request, id_solicitud):
+def encuesta_satisfaccion(request):
    preguntas = Encuesta_pregunta.objects.filter(activo=True)
     
    # Adjuntar las respuestas activas a cada pregunta
@@ -1584,7 +1584,7 @@ def encuesta_satisfaccion(request, id_solicitud):
    if request.method == "POST":
       # Crear cabecera de la encuesta
       cab = Encuesta_cab.objects.create(
-         id_solicitud_id=id_solicitud,
+        # id_solicitud_id=id_solicitud,
          fecha_encuesta=now()
       )
 

@@ -327,7 +327,7 @@ class Solicitud_estado_historico(models.Model):
 
 class Encuesta_cab(models.Model):
     id_encuesta_cab = models.AutoField(primary_key=True)
-    id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
+    #id_solicitud = models.ForeignKey(Solicitud, models.DO_NOTHING, db_column='id_solicitud')
     fecha_encuesta = models.DateTimeField()
 
     class Meta:
@@ -366,7 +366,7 @@ class Encuesta_det_pregunta(models.Model):
 class Encuesta_det_respuesta(models.Model):
     id_encuesta_det_respuesta = models.AutoField(primary_key=True)
     id_encuesta_det_pregunta = models.ForeignKey(Encuesta_det_pregunta, models.DO_NOTHING, db_column='id_encuesta_det_pregunta')
-    id_encuesta_respuesta = models.ForeignKey(Encuesta_pregunta, models.DO_NOTHING, db_column='id_encuesta_pregunta')
+    id_encuesta_respuesta = models.ForeignKey(Encuesta_respuesta, models.DO_NOTHING, db_column='id_encuesta_respuesta')
     seleccionado = models.BooleanField(default=True) 
     activo = models.BooleanField(default=True) 
 
