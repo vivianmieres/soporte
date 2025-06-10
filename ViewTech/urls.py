@@ -91,8 +91,9 @@ urlpatterns = [
    #encuesta de satisfaccion al cliente 
    path("encuesta_satifaccion_cliente/encuesta/", views.encuesta_satisfaccion, name="Encuesta_satisfaccion_cliente"),
    path("encuesta_satifaccion_cliente/gracias", views.encuesta_gracias, name="Encuesta_gracias"),
-   #dashboard solicitud
-   path('dashboard/', views.dashboard_solicitudes, name='Dashboard_solicitudes'),
+   #dashboard
+   path('dashboard/solicitud', views.dashboard_solicitudes, name='Dashboard_solicitudes'),
+   path('dashboard/encuesta', views.dashboard_encuesta, name='Dashboard_encuesta'),
    #encuesta de satisfaccion al cliente 
    #path("encuesta_satifaccion_cliente/encuesta/<int:id_solicitud>/", views.encuesta_satisfaccion, name="Encuesta_satisfaccion_cliente"),
    path("encuesta_satifaccion_cliente/encuesta/", views.encuesta_satisfaccion, name="Encuesta_satisfaccion_cliente"),

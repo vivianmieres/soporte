@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block reporte %}
+<h3 class="text-center">Informe de Encuestas - Mes {{ mes_actual }}</h3>
+
+<form method="get" class="mb-4 text-center">
+    <label for="mes">Filtrar por mes:</label>
+    <select name="mes" id="mes" onchange="this.form.submit()">
+        {% for m in meses %}
+            <option value="{{ m }}" {% if m == mes_actual %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<div class="text-center mb-4">
+    <strong>Total Encuestas:</strong> {{ total }}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container">
+    <div class="row">
+        {% for bloque in datos_por_pregunta %}
+            <div class="col-12 col-md-6 col-lg-4 mb-4 d-flex justify-content-center">
+                <div style="width: 250px;">
+                    <h6 class="text-center">{{ bloque.pregunta }}</h6>
+                    <canvas id="{{ bloque.id }}" width="250" height="250"></canvas>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    {% for bloque in datos_por_pregunta %}
+        const ctx{{ forloop.counter }} = document.getElementById('{{ bloque.id }}').getContext('2d');
+        new Chart(ctx{{ forloop.counter }}, {
+            type: 'pie',
+            data: {
+                labels: [{% for item in bloque.datos %}"{{ item.id_encuesta_respuesta__respuesta }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Respuestas',
+                    data: [{% for item in bloque.datos %}{{ item.cantidad }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    {% endfor %}
+</script>
+
+<div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle"> 
+    <a href="{% url 'Principal' %}" class="btn btn-lg btn-outline-primary mb-3">Salir</a>
+</div>
+{% endblock %}

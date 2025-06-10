@@ -1640,3 +1640,43 @@ def dashboard_solicitudes(request):
       'meses': meses,
    }
    return render(request, 'dashboardSolicitud.html', context)
+
+
+def dashboard_encuesta(request):
+    mes_actual = int(request.GET.get('mes', now().month))
+
+    # Encuestas del mes seleccionado
+    encuestas = models.Encuesta_cab.objects.filter(fecha_encuesta__month=mes_actual)
+
+    total = encuestas.count()
+
+    # Obtener todas las preguntas activas
+    preguntas = models.Encuesta_pregunta.objects.filter(activo=True)
+
+    datos_por_pregunta = []
+
+    for pregunta in preguntas:
+        respuestas = (
+            models.Encuesta_det_respuesta.objects
+            .filter(
+                id_encuesta_det_pregunta__id_encuesta_pregunta=pregunta,
+                id_encuesta_det_pregunta__id_encuesta_cab__in=encuestas,
+                activo=True
+            )
+            .values('id_encuesta_respuesta__respuesta')
+            .annotate(cantidad=Count('id_encuesta_respuesta'))
+        )
+        datos_por_pregunta.append({
+            'pregunta': pregunta.pregunta,
+            'datos': list(respuestas),
+            'id': f"chart_pregunta_{pregunta.id_encuesta_pregunta}"  # para usar en el template
+        })
+
+    context = {
+        'mes_actual': mes_actual,
+        'meses': range(1, 13),
+        'total': total,
+        'datos_por_pregunta': datos_por_pregunta,
+    }
+
+    return render(request, 'dashboardEncuesta.html', context)
